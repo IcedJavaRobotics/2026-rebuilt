@@ -59,30 +59,14 @@ public class RobotContainer {
 
         PIDController headingController = new PIDController(0.015, 0, 0.001);
 
-        private String formattedTime = "hi";
-
-
         /**
          * The container for the robot. Contains subsystems, OI devices, and commands.
          */
         public RobotContainer() {
-                Date currentDate = new Date();
-                LocalTime currentTime = LocalTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-                formattedTime = currentTime.format(formatter);
-
                 // Configure the trigger bindings
                 headingController.enableContinuousInput(-180, 180);
-                // configureNamedCommands();
                 configureBindings();
                 drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity); 
-
-                // elevatorSubsystem.setDefaultCommand(new RunCommand(() ->
-                // elevatorSubsystem.reset(), elevatorSubsystem));
-                // resets to 0
-                // shoulderSubsystem.setDefaultCommand(
-                // new RunCommand(() -> shoulderSubsystem.reset(() -> elevatorInEnough()),
-                // shoulderSubsystem));
 
                 DriverStation.silenceJoystickConnectionWarning(true);
                 autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be
@@ -91,22 +75,7 @@ public class RobotContainer {
 
         }
 
-
-
-
-        // private boolean elevatorInEnough() {
-        //         if (elevatorSubsystem.getElevatorEncoder() <= 50) {
-        //                 return true;
-        //         }
-        //         return false;
-        // }
-
         private double getDeadzone() {
-                // if (auxController.getRightX() >= 0.5 || auxController.getRightX() <= -0.5) {
-                //         return 0;
-                // } else if (getLeftDriverTriggerValue()) {
-                //         return 0;
-                // }
                 return DriverConstants.DEADBAND;
         }
 
@@ -143,12 +112,6 @@ public class RobotContainer {
                         .allianceRelativeControl(true);
 
         SwerveInputStream driveRobotOrientedVelocity = driveAngularVelocity.copy().robotRelative(true).allianceRelativeControl(false);
-        // SwerveInputStream driveDirectAngle = driveAngularVelocity.copy() .robotRelative(() -> isRobotRelative())
-        //                 .withControllerHeadingAxis(() -> driverController.getRightX(),
-        //                                 () -> driverController.getRightY())
-        //                 .headingWhile(true);
-
-        //Command driveFieldOrientedDirectAngle = drivebase.driveRobotOriented(driveDirectAngle);
 
         Command driveFieldOrientedAngularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
         Command driveRobotOriented = drivebase.driveFieldOriented(driveRobotOrientedVelocity);
@@ -168,138 +131,7 @@ public class RobotContainer {
          * joysticks}.
          */
         private void configureBindings() {
-                // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-                // new Trigger(m_exampleSubsystem::exampleCondition)
-                // .onTrue(new ExampleCommand(m_exampleSubsystem));
-
-                // new Trigger(() -> getRightTriggerValue())
-                // .onTrue(new TestCommand());
-
-                // Primary Commands
-                // new Trigger(() -> getRightDriverTriggerValue()) // CORAL STATION COMMAND
-                //                 .whileTrue(new AutoIntakeCommand(intakeSubsystem, shoulderSubsystem,
-                //                                 elevatorSubsystem, wristSubsystem));
-                // new Trigger(() -> getLeftDriverTriggerValue())
-                //                 .whileTrue(new LockApriltag(limelightSubsystem));
-
-                // new JoystickButton(driverController, XboxController.Button.kLeftBumper.value)
-                //                 .whileTrue(new GroundVerticalPickupCommand(intakeSubsystem, shoulderSubsystem, elevatorSubsystem, wristSubsystem));
                 new Trigger(driverController::getRightBumperButton).whileTrue(driveRobotOriented);
-                // new Trigger(() -> getLeftDriverTriggerValue()) // Place Coral On Reef
-                //                 .whileTrue(new AutoPlaceCommand(intakeSubsystem, shoulderSubsystem, elevatorSubsystem));
-
-                // // Driver movement
-                // new JoystickButton(driverController, XboxController.Button.kB.value)
-                //                 .whileTrue(new ZeroGyroCommand(drivebase));
-                // // Wrist Movement Manual
-                // new POVButton(driverController, 90)
-                //                 .whileTrue(new WristTestCommand(wristSubsystem, 1));
-                // new POVButton(driverController, 270)
-                //                 .whileTrue(new WristTestCommand(wristSubsystem, -1));
-                // // Wrist Movement PID
-                // new JoystickButton(driverController, XboxController.Button.kX.value)
-                //                 .whileTrue(new WristVerticalCommand(wristSubsystem));
-                // new JoystickButton(driverController, XboxController.Button.kA.value)
-                //                 .whileTrue(new WristHorizontalCommand(wristSubsystem));
-                // new JoystickButton(driverController, XboxController.Button.kA.value)
-                // .whileTrue(new ApriltagLineup(drivebase, limelightSubsystem));
-
-                // // Shoulder Movement
-                // new JoystickButton(driverController, XboxController.Button.kStart.value)
-                //                 .whileTrue(new ShoulderCommand(shoulderSubsystem, 1));
-                // new JoystickButton(driverController, XboxController.Button.kBack.value)
-                //                 .whileTrue(new ShoulderCommand(shoulderSubsystem, -1));
-
-                // // Elevator Movement
-                // new JoystickButton(driverStation, 6)
-                //                 .whileTrue(new ElevatorINCommand(elevatorSubsystem));
-                // new JoystickButton(driverStation, 8)
-                //                 .whileTrue(new WristHorizontalCommand(wristSubsystem));
-                // new JoystickButton(driverStation, 1)
-                //                 .whileTrue(new ElevatorOUTCommand(elevatorSubsystem)); 
-                //  new JoystickButton(driverStation, 9)
-                //                 .whileTrue(new WristVerticalCommand(wristSubsystem));
-
-                // // Intake Control
-                // new JoystickButton(driverController, XboxController.Button.kY.value)
-                //                 .whileTrue(new IntakeOutCommand(intakeSubsystem, true));
-                // new POVButton(driverController, 0)
-                //                 .whileTrue(new IntakeOutSlowCommand(intakeSubsystem));
-                // new POVButton(driverController, 180)
-                //                 .whileTrue(new IntakeCommand(intakeSubsystem, false));
-
-
-                // ---------AUX CONTROLS
-                // --------------------------------------------------------------
-
-                // // Grid navigation
-                // new Trigger(() -> getRightAuxTriggerValue()) // FOR SELECTOR SUBSYSTEM
-                //                 .whileTrue(new AutoPlaceCommand(intakeSubsystem, shoulderSubsystem, elevatorSubsystem));
-                // new Trigger(() -> getLeftAuxTriggerValue())
-                //                 .whileTrue(new ClearAlgaeCommand(shoulderSubsystem, elevatorSubsystem, wristSubsystem, intakeSubsystem));
-
-                // new POVButton(auxController, 180) /* D-Pad pressed DOWN */
-                //                 .whileTrue(new CursorDownCommand(selectorSubsystem));
-                // new POVButton(auxController, 0) /* D-Pad pressed UP */
-                //                 .whileTrue(new CursorUpCommand(selectorSubsystem));
-                // new POVButton(auxController, 90) /* D-Pad pressed Right */
-                //                 .whileTrue(new CursorRightCommand(selectorSubsystem));
-                // // new POVButton(auxController, 270) /* D-Pad pressed Left */
-                // //                 .whileTrue(new CursorLeftCommand(selectorSubsystem));
-                // new POVButton(auxController, 90) /* D-Pad pressed DOWN */
-                //                 .whileTrue(new IntakeCommand(intakeSubsystem, true));
-                // new POVButton(auxController, 270) /* D-Pad pressed UP */
-                //                 .whileTrue(new IntakeOutCommand(intakeSubsystem, true));
-                // // new POVButton(auxController, 90) /* D-Pad pressed Right */
-                // //                 .whileTrue(new CursorRightCommand(selectorSubsystem));
-                // // new POVButton(auxController, 270) /* D-Pad pressed Left */
-                // //                 .whileTrue(new CursorLeftCommand(selectorSubsystem));
-
-
-                // // Movement presets
-                // new JoystickButton(auxController, XboxController.Button.kY.value)
-                //                 .whileTrue(new MoveRightL4Command(shoulderSubsystem, elevatorSubsystem,
-                //                                 wristSubsystem));
-                // new JoystickButton(auxController, XboxController.Button.kX.value)
-                //                 .whileTrue(new MoveRightL1Command(shoulderSubsystem, elevatorSubsystem,
-                //                                 wristSubsystem));
-                // new JoystickButton(auxController, XboxController.Button.kA.value)
-                //                 .whileTrue(new MoveRightL2Command(shoulderSubsystem, elevatorSubsystem,
-                //                                 wristSubsystem));
-                // new JoystickButton(auxController, XboxController.Button.kB.value)
-                //                 .whileTrue(new MoveRightL3Command(shoulderSubsystem, elevatorSubsystem,
-                //                                 wristSubsystem));
-                // new POVButton(auxController, 180) /* D-Pad pressed DOWN */
-                //                 .whileTrue(new MoveLowerAlgaeCommand(shoulderSubsystem, elevatorSubsystem,
-                //                                 wristSubsystem, intakeSubsystem));
-
-                // // new JoystickButton(auxController, XboxController.Button.)
-
-                // // Wrist PIDs
-                // new JoystickButton(auxController, XboxController.Button.kLeftBumper.value)
-                //                 .whileTrue(new WristVerticalCommand(wristSubsystem));
-                // new JoystickButton(auxController, XboxController.Button.kRightBumper.value)
-                //                 .whileTrue(new WristHorizontalCommand(wristSubsystem));
-
-                // // Climber Controls
-                // new JoystickButton(auxController, XboxController.Button.kStart.value)
-                //                 .whileTrue(new ActuatorInCommand(actuatorSubsystem));
-                // new JoystickButton(auxController, XboxController.Button.kBack.value)
-                //                 .whileTrue(new ActuatorOutCommand(actuatorSubsystem));
-
-
-
-
-                /*
-                 * OTHER CONTROLS::
-                 * DRIVER:
-                 * -- LEFT JOYSTICK: TRANSLATION
-                 * -- RIGHT JOYSTICK: ROTATION
-                 * AUX:
-                 * -- RIGHT JOYSTICK: ROBOT FACES LEFT CORAL STATION, AND VICE VERSA
-                 * 
-                 */
-
         }
 
         // private void configureNamedCommands(){
@@ -407,7 +239,6 @@ public class RobotContainer {
          */
         private double getRightX() {
                 SmartDashboard.putNumber("pos rot", drivebase.getSwerveDrive().getPose().getRotation().getDegrees());
-                SmartDashboard.putString("time", formattedTime);
                 if(getLeftDriverTriggerValue()){
                 
                                 return getControllerRotation();
