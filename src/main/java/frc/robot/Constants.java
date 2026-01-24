@@ -29,6 +29,7 @@ public final class Constants {
 
   public static class CandleConstants {
     public static final int CANDLE_ID = 57;
+    public static final int TEST = 7;
   }
 
   public static class WristConstants {
