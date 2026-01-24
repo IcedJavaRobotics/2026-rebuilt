@@ -30,3 +30,9 @@
 ### Links
 [Engineering Notebook](https://markdownlivepreview.com/)
 [Website](https://markdownlivepreview.com/)
+
+### Sponsors
+<p float="left">
+<img src="/images/sponsor/bakerwealth.png" alt="bakerwealth" width="200" height="200"/>
+<img src="/images/sponsor/genehass.png" alt="genehass" width="200" height="200"/>
+</p>
