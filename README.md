@@ -17,7 +17,7 @@
 <img src="/images/robot/robot2.png" alt="robot2" width="300" height="300"/>
 </p>
 
-## Information
+## More Information
 
 ### The Programming Team
 * Veterans
