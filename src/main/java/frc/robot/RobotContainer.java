@@ -5,37 +5,22 @@
 package frc.robot;
 
 import frc.robot.Constants.DriverConstants;
+import frc.robot.commands.RollerInCommand;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 
-import java.util.function.Supplier;
-
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-import java.util.Date;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 /**
  * This class is where the bulk of the robot should be declared. Since
  * Command-based is a
@@ -49,6 +34,7 @@ public class RobotContainer {
         // The robot's subsystems and commands are defined here...
 
         private final SwerveSubsystem drivebase = new SwerveSubsystem();
+        private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
         //private final SelectorSubsystem selectorSubsystem = new SelectorSubsystem(shoulderSubsystem, elevatorSubsystem,wristSubsystem);
 
         private final SendableChooser<Command> autoChooser;
@@ -132,21 +118,15 @@ public class RobotContainer {
          */
         private void configureBindings() {
                 new Trigger(driverController::getRightBumperButton).whileTrue(driveRobotOriented);
+
+                //Intake bindings
+                new JoystickButton (auxController, XboxController.Button.kA.value)
+                        .whileTrue(new RollerInCommand(intakeSubsystem));
         }
+
 
         // private void configureNamedCommands(){
         //         NamedCommands.registerCommand("armL1", new MoveRightL1Command(shoulderSubsystem, elevatorSubsystem, wristSubsystem));
-        //         NamedCommands.registerCommand("armL2", new MoveRightL2Command(shoulderSubsystem, elevatorSubsystem, wristSubsystem));
-        //         NamedCommands.registerCommand("armL3", new MoveRightL3Command(shoulderSubsystem, elevatorSubsystem, wristSubsystem));
-
-        //         NamedCommands.registerCommand("moveTo", new MoveToStationCommand(shoulderSubsystem, elevatorSubsystem, wristSubsystem));
-
-        //         NamedCommands.registerCommand("place", new AutoPlaceCommand(intakeSubsystem, shoulderSubsystem, elevatorSubsystem));
-        //         NamedCommands.registerCommand("autoIntake", new AutoIntakeCommand(intakeSubsystem, shoulderSubsystem, elevatorSubsystem, wristSubsystem));
-        //         NamedCommands.registerCommand("intakeOut", new IntakeOutCommand(intakeSubsystem, true));
-        //         NamedCommands.registerCommand("algae-clear", new ClearAlgaeCommand(shoulderSubsystem, elevatorSubsystem, wristSubsystem, intakeSubsystem));
-        //         NamedCommands.registerCommand("reset-elevator", new ResetElevatorCommand(elevatorSubsystem));
-                
         // }
 
         private void initializeDashboard(){

@@ -26,6 +26,17 @@ public final class Constants {
   }
 
 
+  public static class  IntakeConstants {
+  
+    public static final double ELEVATOR_SPEED = .1;
+    public static final double ROLLER_SPEED = .1;
+    public static final int ELEVATOR_MOTOR_ID = 51;
+    public static final int ROLLER_MOTOR_ID = 52;
+    
+    
+  }
+
+
 
 
 
