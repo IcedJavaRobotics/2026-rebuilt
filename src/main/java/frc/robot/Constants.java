@@ -35,13 +35,16 @@ public final class Constants {
     public static final int SHOOTER_LEFT_MOTOR_ID = 61;
     public static final int SHOOTER_RIGHT_MOTOR_ID = 62;
 
-    public static final int CLIMBER_LEFT_MOTOR_ID = 71;
-    public static final int CLIMBER_RIGHT_MOTOR_ID = 72;
+    public static final int CLIMBER_MOTOR_ID = 71;
 
     public static final int SPINDEXER_MOTOR_ID = 81;
+
+    public static final String CANBUS = "rio";
+    public static final String CANIVORE = "iceberg-canivore";
   }
 
   public static class ShooterConstants {
+    public static final double GEAR_RATIO = 1;
     // Speed for functions check without a ball
     public static final double TESTING_SPEED = 0.15;
 

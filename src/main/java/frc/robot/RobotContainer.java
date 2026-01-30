@@ -5,7 +5,6 @@
 package frc.robot;
 
 import frc.robot.Constants.DriverConstants;
-import frc.robot.commands.ShooterFunctionsCheckCommand;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
@@ -18,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import swervelib.SwerveInputStream;
 
+import java.io.ObjectInputFilter.Status;
 import java.util.Map;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import frc.robot.subsystems.*;
+import frc.robot.commands.functionchecks.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -43,6 +44,7 @@ public class RobotContainer {
         private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
         private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem();
         private final VisionSubsystem visionSubsystem = new VisionSubsystem();
+        private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
 
         private final SendableChooser<Command> autoChooser;
 
@@ -140,9 +142,11 @@ public class RobotContainer {
                 ShuffleboardLayout swerveLayout = statusCheckTab.getLayout("Swerve", BuiltInLayouts.kList).withSize(2,4);
                 ShuffleboardLayout motorLayout = statusCheckTab.getLayout("Motors",BuiltInLayouts.kList).withSize(2,4);
                 ShuffleboardLayout miscLayout = statusCheckTab.getLayout("Misc",BuiltInLayouts.kList).withSize(2,4);
-                ShuffleboardLayout statusLayout = statusCheckTab.getLayout("Status", BuiltInLayouts.kList).withSize(2,4);
+        
                 visionSubsystem.functionsCheck(statusCheckTab);
                 drivebase.functionsCheck(statusCheckTab);
+                climberSubsystem.functionsCheck(statusCheckTab);
+                //TODO Add motor torque
 
                 // Functions Checks
                 ShuffleboardLayout swerveTests = functionsCheckTab.getLayout("Swerve", BuiltInLayouts.kList).withSize(2,4).withProperties(Map.of("Label position", "HIDDEN")); 
