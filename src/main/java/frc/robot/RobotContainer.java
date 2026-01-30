@@ -5,15 +5,20 @@
 package frc.robot;
 
 import frc.robot.Constants.DriverConstants;
+import frc.robot.commands.ShooterFunctionsCheckCommand;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import swervelib.SwerveInputStream;
+
+import java.util.Map;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -47,6 +52,7 @@ public class RobotContainer {
 
         PIDController headingController = new PIDController(0.015, 0, 0.001);
 
+        ShuffleboardTab statusCheckTab = Shuffleboard.getTab("Status");
         ShuffleboardTab functionsCheckTab = Shuffleboard.getTab("Functions Check");
 
         /**
@@ -131,7 +137,18 @@ public class RobotContainer {
                 SmartDashboard.putNumber("odometry angle", drivebase.getPose().getRotation().getDegrees());
 
                 // Checking conections
-                visionSubsystem.functionsCheck(functionsCheckTab);
+                ShuffleboardLayout swerveLayout = statusCheckTab.getLayout("Swerve", BuiltInLayouts.kList).withSize(2,4);
+                ShuffleboardLayout motorLayout = statusCheckTab.getLayout("Motors",BuiltInLayouts.kList).withSize(2,4);
+                ShuffleboardLayout miscLayout = statusCheckTab.getLayout("Misc",BuiltInLayouts.kList).withSize(2,4);
+                ShuffleboardLayout statusLayout = statusCheckTab.getLayout("Status", BuiltInLayouts.kList).withSize(2,4);
+                visionSubsystem.functionsCheck(statusCheckTab);
+                drivebase.functionsCheck(statusCheckTab);
+
+                // Functions Checks
+                ShuffleboardLayout swerveTests = functionsCheckTab.getLayout("Swerve", BuiltInLayouts.kList).withSize(2,4).withProperties(Map.of("Label position", "HIDDEN")); 
+
+                swerveTests.add(new ShooterFunctionsCheckCommand());
+
         }
 
         private boolean isRobotRelative(){

@@ -24,7 +24,12 @@ public class VisionSubsystem extends SubsystemBase {
   }
 
   public void functionsCheck(ShuffleboardTab functionsCheckTab) {
-    ShuffleboardLayout cameraLayout = functionsCheckTab.getLayout("Cameras",BuiltInLayouts.kList).withSize(2,2);
+    ShuffleboardLayout cameraLayout = functionsCheckTab.getLayout("Cameras",BuiltInLayouts.kList).withSize(2,4);
     // Add booleans of if cameras are connected into this camera layout tab 
+  }
+
+  public void setupVisionTab(){
+    //Add camera connections to the vision tab as well
+    //Add all camera POVs as well as the main camera and the pose estimator.
   }
 }
