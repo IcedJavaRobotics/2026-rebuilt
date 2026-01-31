@@ -68,6 +68,14 @@ public final class Constants {
     public static final double MANUAL_SHUFFLE_SPEED = 0.1; // hold this when going over the bump to ensure balls dont fall out.
   }
 
+  public static class ClimberConstants {
+    public static final double STALL_TORQUE = 7.09;
+    public static final double STALL_CURRENT = 370;
+    public static final double TORQUE_CONSTANT = STALL_TORQUE/STALL_CURRENT;
+    public static final double EFFICIENCY = 0.9;
+    public static final double GEAR_RATIO = 12; // 12:1
+  }
+
   public static class VisionSubsystem {
     public static final String LIMELIGHT_NAME = "sauron";
     public static final String LIMELIGHT_IP = "http://10.68.94.11:5801/";

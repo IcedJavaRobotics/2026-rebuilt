@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.HardwareConstants;
+import frc.robot.Constants.ClimberConstants;
 
 public class ClimberSubsystem extends SubsystemBase {
 
@@ -21,13 +22,13 @@ public class ClimberSubsystem extends SubsystemBase {
   }
 
   public void functionsCheck(ShuffleboardTab statusCheckTab) {
-    
+    statusCheckTab.addDouble("ClimberTorque", () -> getTorque());
   }
 
   public double getTorque(){
     double currentAmps = climberMotor.getStatorCurrent().getValueAsDouble();
-    double torqueNm = currentAmps * (7.09 / 370.0); // Current * (Stall Torque / Stall Current)
-    return torqueNm;
+    double motorTorque = currentAmps * ClimberConstants.TORQUE_CONSTANT;
+    return motorTorque * ClimberConstants.GEAR_RATIO * ClimberConstants.EFFICIENCY;
   }
 
   @Override
