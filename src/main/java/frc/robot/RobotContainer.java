@@ -10,6 +10,10 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -21,6 +25,19 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import swervelib.SwerveInputStream;
+
+import java.io.ObjectInputFilter.Status;
+import java.util.Map;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
+import frc.robot.subsystems.*;
+import frc.robot.commands.functionchecks.*;
+
 /**
  * This class is where the bulk of the robot should be declared. Since
  * Command-based is a
@@ -36,6 +53,10 @@ public class RobotContainer {
         private final SwerveSubsystem drivebase = new SwerveSubsystem();
         private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
         //private final SelectorSubsystem selectorSubsystem = new SelectorSubsystem(shoulderSubsystem, elevatorSubsystem,wristSubsystem);
+        private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
+        private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem();
+        private final VisionSubsystem visionSubsystem = new VisionSubsystem();
+        private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
 
         private final SendableChooser<Command> autoChooser;
 
@@ -44,6 +65,9 @@ public class RobotContainer {
         private final Joystick driverStation = new Joystick(DriverConstants.DRIVER_STATION_PORT);
 
         PIDController headingController = new PIDController(0.015, 0, 0.001);
+
+        ShuffleboardTab statusCheckTab = Shuffleboard.getTab("Status");
+        ShuffleboardTab functionsCheckTab = Shuffleboard.getTab("Functions Check");
 
         /**
          * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -58,6 +82,8 @@ public class RobotContainer {
                 autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be
                 // `Commands.none()`
                 SmartDashboard.putData("AutoSelec", autoChooser);
+
+                initializeDashboard();
 
         }
 
@@ -124,14 +150,25 @@ public class RobotContainer {
                         .whileTrue(new RollerInCommand(intakeSubsystem));
         }
 
-
-        // private void configureNamedCommands(){
-        //         NamedCommands.registerCommand("armL1", new MoveRightL1Command(shoulderSubsystem, elevatorSubsystem, wristSubsystem));
-        // }
-
         private void initializeDashboard(){
                 SmartDashboard.putNumber("Gyro", drivebase.getSwerveDrive().getGyro().getRotation3d().getZ() * (180/Math.PI));
                 SmartDashboard.putNumber("odometry angle", drivebase.getPose().getRotation().getDegrees());
+
+                // Checking conections
+                ShuffleboardLayout swerveLayout = statusCheckTab.getLayout("Swerve", BuiltInLayouts.kList).withSize(2,4);
+                ShuffleboardLayout motorLayout = statusCheckTab.getLayout("Motors",BuiltInLayouts.kList).withSize(2,4);
+                ShuffleboardLayout miscLayout = statusCheckTab.getLayout("Misc",BuiltInLayouts.kList).withSize(2,4);
+        
+                visionSubsystem.functionsCheck(statusCheckTab);
+                drivebase.functionsCheck(statusCheckTab);
+                climberSubsystem.functionsCheck(statusCheckTab);
+                //TODO Add motor torque
+
+                // Functions Checks
+                ShuffleboardLayout swerveTests = functionsCheckTab.getLayout("Swerve", BuiltInLayouts.kList).withSize(2,4).withProperties(Map.of("Label position", "HIDDEN")); 
+
+                swerveTests.add(new ShooterFunctionsCheckCommand());
+
         }
 
         private boolean isRobotRelative(){
