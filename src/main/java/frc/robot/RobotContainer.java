@@ -5,7 +5,7 @@
 package frc.robot;
 
 import frc.robot.Constants.DriverConstants;
-import frc.robot.commands.RollerInCommand;
+// import frc.robot.commands.RollerInCommand;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.IntakeSubsystem;
+// import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 
@@ -51,7 +51,7 @@ public class RobotContainer {
         // The robot's subsystems and commands are defined here...
 
         private final SwerveSubsystem drivebase = new SwerveSubsystem();
-        private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+        // private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
         //private final SelectorSubsystem selectorSubsystem = new SelectorSubsystem(shoulderSubsystem, elevatorSubsystem,wristSubsystem);
         private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
         private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem();
@@ -146,8 +146,8 @@ public class RobotContainer {
                 new Trigger(driverController::getRightBumperButton).whileTrue(driveRobotOriented);
 
                 //Intake bindings
-                new JoystickButton (auxController, XboxController.Button.kA.value)
-                        .whileTrue(new RollerInCommand(intakeSubsystem));
+                // new JoystickButton (auxController, XboxController.Button.kA.value)
+                //         .whileTrue(new RollerInCommand(intakeSubsystem));
         }
 
         private void initializeDashboard(){
@@ -167,7 +167,7 @@ public class RobotContainer {
                 // Functions Checks
                 ShuffleboardLayout swerveTests = functionsCheckTab.getLayout("Swerve", BuiltInLayouts.kList).withSize(2,4).withProperties(Map.of("Label position", "HIDDEN")); 
 
-                swerveTests.add(new ShooterFunctionsCheckCommand());
+                functionsCheckTab.add(new ShooterFunctionsCheckCommand(shooterSubsystem));
 
         }
 

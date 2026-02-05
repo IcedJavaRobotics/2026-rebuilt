@@ -5,11 +5,17 @@
 package frc.robot.commands.functionchecks;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.ShooterSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ShooterFunctionsCheckCommand extends Command {
   /** Creates a new ShooterFunctionsCheckCommand. */
-  public ShooterFunctionsCheckCommand() {
+  ShooterSubsystem shooterSubsystem;
+  public ShooterFunctionsCheckCommand(ShooterSubsystem shooterSubsystem) {
+    this.shooterSubsystem = shooterSubsystem;
+    addRequirements(shooterSubsystem);
+
+
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -19,11 +25,11 @@ public class ShooterFunctionsCheckCommand extends Command {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {shooterSubsystem.spinUp(0.5);}
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {shooterSubsystem.spinUp(0);}
 
   // Returns true when the command should end.
   @Override

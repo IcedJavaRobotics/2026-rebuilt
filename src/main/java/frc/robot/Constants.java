@@ -41,6 +41,8 @@ public final class Constants {
 
     public static final String CANBUS = "rio";
     public static final String CANIVORE = "iceberg-canivore";
+
+    public static final int KRAKEN_RPS = 100;
   }
 
   public static class ShooterConstants {
@@ -75,17 +77,6 @@ public final class Constants {
     public static final double EFFICIENCY = 0.9;
     public static final double GEAR_RATIO = 12; // 12:1
   }
-
-  public static class  IntakeConstants {
-  
-    public static final double ELEVATOR_SPEED = .1;
-    public static final double ROLLER_SPEED = .1;
-    public static final int ELEVATOR_MOTOR_ID = 51;
-    public static final int ROLLER_MOTOR_ID = 52;
-    
-    
-  }
-
 
   public static class VisionSubsystem {
     public static final String LIMELIGHT_NAME = "sauron";
