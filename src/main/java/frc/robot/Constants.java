@@ -76,6 +76,17 @@ public final class Constants {
     public static final double GEAR_RATIO = 12; // 12:1
   }
 
+  public static class  IntakeConstants {
+  
+    public static final double ELEVATOR_SPEED = .1;
+    public static final double ROLLER_SPEED = .1;
+    public static final int ELEVATOR_MOTOR_ID = 51;
+    public static final int ROLLER_MOTOR_ID = 52;
+    
+    
+  }
+
+
   public static class VisionSubsystem {
     public static final String LIMELIGHT_NAME = "sauron";
     public static final String LIMELIGHT_IP = "http://10.68.94.11:5801/";
