@@ -40,9 +40,9 @@ public class ShooterSubsystem extends SubsystemBase {
   /** Creates a new ShooterSubsystem. */
   public ShooterSubsystem() {
     this.shooterMotorMaster = new TalonFX(HardwareConstants.SHOOTER_LEFT_MOTOR_ID, HardwareConstants.CANBUS);
-    this.shooterMotorSlave = new TalonFX(HardwareConstants.SHOOTER_LEFT_MOTOR_ID, HardwareConstants.CANBUS);
+    this.shooterMotorSlave = new TalonFX(HardwareConstants.SHOOTER_RIGHT_MOTOR_ID, HardwareConstants.CANBUS);
 
-    shooterMotorSlave.setControl(new Follower(HardwareConstants.SHOOTER_LEFT_MOTOR_ID, MotorAlignmentValue.Opposed)); //sets the slave motor to follow the master motor movement
+    shooterMotorSlave.setControl(new Follower(HardwareConstants.SHOOTER_LEFT_MOTOR_ID, MotorAlignmentValue.Aligned)); //sets the slave motor to follow the master motor movement
   }
 
   public void spinUp(double speed){
@@ -50,7 +50,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public void testLinkage(){
-    shooterMotorMaster.set(0.05);
+    shooterMotorMaster.set(-0.5);
     System.out.println("-------------------- TESTING LINKAGE ------------------------");
   }
   

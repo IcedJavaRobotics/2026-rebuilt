@@ -50,7 +50,7 @@ import frc.robot.commands.functionchecks.*;
 public class RobotContainer {
         // The robot's subsystems and commands are defined here...
 
-        private final SwerveSubsystem drivebase = new SwerveSubsystem();
+        //private final SwerveSubsystem drivebase = new SwerveSubsystem();
         // private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
         //private final SelectorSubsystem selectorSubsystem = new SelectorSubsystem(shoulderSubsystem, elevatorSubsystem,wristSubsystem);
         private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
@@ -58,7 +58,7 @@ public class RobotContainer {
         private final VisionSubsystem visionSubsystem = new VisionSubsystem();
         private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
 
-        private final SendableChooser<Command> autoChooser;
+        //private final SendableChooser<Command> autoChooser;
 
         XboxController driverController = new XboxController(DriverConstants.MAIN_DRIVER_PORT);
         XboxController auxController = new XboxController(DriverConstants.AUX_DRIVER_PORT);
@@ -76,12 +76,12 @@ public class RobotContainer {
                 // Configure the trigger bindings
                 headingController.enableContinuousInput(-180, 180);
                 configureBindings();
-                drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity); 
+                //drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity); 
 
                 DriverStation.silenceJoystickConnectionWarning(true);
-                autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be
+                //autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be
                 // `Commands.none()`
-                SmartDashboard.putData("AutoSelec", autoChooser);
+                //SmartDashboard.putData("AutoSelec", autoChooser);
 
                 initializeDashboard();
 
@@ -115,18 +115,18 @@ public class RobotContainer {
                 }
         }
 
-        SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
-                        () -> driverController.getLeftY() * getMultiplier(),
-                        () -> driverController.getLeftX() * getMultiplier())
-                        .withControllerRotationAxis(() -> getRightX())
-                        .deadband(getDeadzone())
-                        .scaleTranslation(1)// Can be changed to alter speed
-                        .allianceRelativeControl(true);
+        // SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
+        //                 () -> driverController.getLeftY() * getMultiplier(),
+        //                 () -> driverController.getLeftX() * getMultiplier())
+        //                 .withControllerRotationAxis(() -> getRightX())
+        //                 .deadband(getDeadzone())
+        //                 .scaleTranslation(1)// Can be changed to alter speed
+        //                 .allianceRelativeControl(true);
 
-        SwerveInputStream driveRobotOrientedVelocity = driveAngularVelocity.copy().robotRelative(true).allianceRelativeControl(false);
+        // SwerveInputStream driveRobotOrientedVelocity = driveAngularVelocity.copy().robotRelative(true).allianceRelativeControl(false);
 
-        Command driveFieldOrientedAngularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
-        Command driveRobotOriented = drivebase.driveFieldOriented(driveRobotOrientedVelocity);
+        //Command driveFieldOrientedAngularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
+        //Command driveRobotOriented = drivebase.driveFieldOriented(driveRobotOrientedVelocity);
 
         /**
          * Use this method to define your trigger->command mappings. Triggers can be
@@ -143,7 +143,7 @@ public class RobotContainer {
          * joysticks}.
          */
         private void configureBindings() {
-                new Trigger(driverController::getRightBumperButton).whileTrue(driveRobotOriented);
+                //new Trigger(driverController::getRightBumperButton).whileTrue(driveRobotOriented);
                 new JoystickButton(driverController, XboxController.Button.kA.value)
                         .whileTrue(new ShooterFunctionsCheckCommand(shooterSubsystem));
 
@@ -153,8 +153,8 @@ public class RobotContainer {
         }
 
         private void initializeDashboard(){
-                SmartDashboard.putNumber("Gyro", drivebase.getSwerveDrive().getGyro().getRotation3d().getZ() * (180/Math.PI));
-                SmartDashboard.putNumber("odometry angle", drivebase.getPose().getRotation().getDegrees());
+                //SmartDashboard.putNumber("Gyro", drivebase.getSwerveDrive().getGyro().getRotation3d().getZ() * (180/Math.PI));
+                //SmartDashboard.putNumber("odometry angle", drivebase.getPose().getRotation().getDegrees());
 
                 // Checking conections
                 ShuffleboardLayout swerveLayout = statusCheckTab.getLayout("Swerve", BuiltInLayouts.kList).withSize(2,4);
@@ -162,7 +162,7 @@ public class RobotContainer {
                 ShuffleboardLayout miscLayout = statusCheckTab.getLayout("Misc",BuiltInLayouts.kList).withSize(2,4);
         
                 visionSubsystem.functionsCheck(statusCheckTab);
-                drivebase.functionsCheck(statusCheckTab);
+                //drivebase.functionsCheck(statusCheckTab);
                 climberSubsystem.functionsCheck(statusCheckTab);
                 //TODO Add motor torque
 
@@ -257,7 +257,7 @@ public class RobotContainer {
          * @return Will return the controller input either divided by two or not based on whether you hold the joystick button. If you hold left trigger, it will use the limelight to auto rotate
          */
         private double getRightX() {
-                SmartDashboard.putNumber("pos rot", drivebase.getSwerveDrive().getPose().getRotation().getDegrees());
+                //SmartDashboard.putNumber("pos rot", drivebase.getSwerveDrive().getPose().getRotation().getDegrees());
                 if(getLeftDriverTriggerValue()){
                 
                                 return getControllerRotation();
@@ -279,7 +279,7 @@ public class RobotContainer {
          * @return the command to run in autonomous
          */
         public Command getAutonomousCommand() {
-                return autoChooser.getSelected();
-                // return null;
+                //return autoChooser.getSelected();
+                 return null;
         }
 }
