@@ -49,7 +49,14 @@ public class ShooterSubsystem extends SubsystemBase {
     shooterMotorMaster.set(spinUpController.calculate(shooterMotorMaster.getVelocity().getValueAsDouble() / HardwareConstants.KRAKEN_RPS, speed));
   }
 
+  public void testLinkage(){
+    shooterMotorMaster.set(0.05);
+    System.out.println("-------------------- TESTING LINKAGE ------------------------");
+  }
   
+  public void stop(){
+    shooterMotorMaster.set(0);
+  }
 
 
   @Override

@@ -144,6 +144,8 @@ public class RobotContainer {
          */
         private void configureBindings() {
                 new Trigger(driverController::getRightBumperButton).whileTrue(driveRobotOriented);
+                new JoystickButton(driverController, XboxController.Button.kA.value)
+                        .whileTrue(new ShooterFunctionsCheckCommand(shooterSubsystem));
 
                 //Intake bindings
                 // new JoystickButton (auxController, XboxController.Button.kA.value)
