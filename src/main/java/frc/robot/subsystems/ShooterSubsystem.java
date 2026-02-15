@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import java.util.Map;
+import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -15,16 +16,18 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.HardwareConstants;
+import frc.robot.Constants.ShooterConstants;
 
 public class ShooterSubsystem extends SubsystemBase {
 
   TalonFX shooterMotorMaster;
   TalonFX shooterMotorSlave;
 
-  ShuffleboardTab functionsCheckTab = Shuffleboard.getTab("Functions Check");
+  //ShuffleboardTab functionsCheckTab = Shuffleboard.getTab("Functions Check");
 
 //  public final NetworkTableEntry myValue =
 //       functionsCheckTab.add("My Value", 0.0)
@@ -43,6 +46,9 @@ public class ShooterSubsystem extends SubsystemBase {
     this.shooterMotorSlave = new TalonFX(HardwareConstants.SHOOTER_RIGHT_MOTOR_ID, HardwareConstants.CANBUS);
 
     shooterMotorSlave.setControl(new Follower(HardwareConstants.SHOOTER_LEFT_MOTOR_ID, MotorAlignmentValue.Aligned)); //sets the slave motor to follow the master motor movement
+    
+    SmartDashboard.putNumber("motor-test-speed", ShooterConstants.TESTING_SPEED);
+    
   }
 
   public void spinUp(double speed){
@@ -52,6 +58,8 @@ public class ShooterSubsystem extends SubsystemBase {
   public void testLinkage(){
     shooterMotorMaster.set(-0.5);
     System.out.println("-------------------- TESTING LINKAGE ------------------------");
+    System.out.println(SmartDashboard.getNumber("motor-test-speed", 0));
+    
   }
   
   public void stop(){
