@@ -5,6 +5,7 @@
 package frc.robot;
 
 import frc.robot.Constants.DriverConstants;
+import frc.robot.Constants.DriverStationConstants;
 // import frc.robot.commands.RollerInCommand;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -36,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import frc.robot.subsystems.*;
+import frc.robot.commands.*;
 import frc.robot.commands.functionchecks.*;
 
 /**
@@ -68,6 +70,8 @@ public class RobotContainer {
 
         ShuffleboardTab statusCheckTab = Shuffleboard.getTab("Status");
         ShuffleboardTab functionsCheckTab = Shuffleboard.getTab("Functions Check");
+
+        Trigger spindexerSwitch = new Trigger( () -> getManualSwitch());
 
         /**
          * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -155,10 +159,19 @@ public class RobotContainer {
                         .whileTrue(new IntakeRollerTest(intakeSubsystem));
 
                 
+                spindexerSwitch.onTrue(new SpindexerTestCommand(spindexerSubsystem));
                 
-                //Intake bindings
-                // new JoystickButton (auxController, XboxController.Button.kA.value)
-                //         .whileTrue(new RollerInCommand(intakeSubsystem));
+                new JoystickButton(driverStation, DriverStationConstants.BOTTOM_LEFT)
+                        .whileTrue(new ShooterFunctionsCheckCommand(shooterSubsystem));
+
+                new JoystickButton(driverStation, DriverStationConstants.TOP_LEFT)
+                        .whileTrue(new IntakeElevatorTuner(intakeSubsystem, 0.05));
+                new JoystickButton(driverStation, DriverStationConstants.MIDDLE_LEFT)
+                        .whileTrue(new IntakeElevatorTuner(intakeSubsystem, -0.05));
+
+                new JoystickButton(driverStation, DriverStationConstants.TOP_RIGHT)
+                        .whileTrue(new IntakeRollerTest(intakeSubsystem));
+              
         }
 
         private void initializeDashboard(){
