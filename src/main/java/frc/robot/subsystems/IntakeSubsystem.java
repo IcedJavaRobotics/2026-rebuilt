@@ -6,8 +6,10 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.HardwareConstants;
 
 public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new IntakeSubsystem. */
@@ -17,45 +19,30 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public IntakeSubsystem() {
 
-    this.intakeElevatorMotor = new TalonFX(Constants.IntakeConstants.ELEVATOR_MOTOR_ID, "rio");
-    this.intakeRollerMotor = new TalonFX(Constants.IntakeConstants.ROLLER_MOTOR_ID, "rio");
+    this.intakeElevatorMotor = new TalonFX(HardwareConstants.INTAKE_ELEVATOR_ID, "rio");
+    this.intakeRollerMotor = new TalonFX(HardwareConstants.INTAKE_ROLLER_ID, "rio");
 
+    SmartDashboard.putNumber("roller-test-speed", 0.05);
   } 
 
-  public void extendIntake (){
-
-    intakeElevatorMotor.set(Constants.IntakeConstants.ELEVATOR_SPEED);
-
+  public void setIntake(double speed){
+    intakeElevatorMotor.set(speed);
   }
-  public void retractIntake (){
-
-    intakeElevatorMotor.set(-Constants.IntakeConstants.ELEVATOR_SPEED);
-
-  }
-  public void stopIntake (){
-
+  public void stopIntake(){
     intakeElevatorMotor.set(0);
-
   }
 
-  public void rollerIn (){
-
-    intakeRollerMotor.set(Constants.IntakeConstants.ROLLER_SPEED);
-
+  public void setRoller(double speed){
+    intakeRollerMotor.set(speed);
   }
-  public void rollerOut (){
-
-    intakeRollerMotor.set(-Constants.IntakeConstants.ROLLER_SPEED);
-
-  }
-  public void rollerStop (){
-
+  public void stopRoller(){
     intakeRollerMotor.set(0);
-
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("elevatorEncoder", intakeElevatorMotor.getPosition().getValueAsDouble());
+    
   }
 }

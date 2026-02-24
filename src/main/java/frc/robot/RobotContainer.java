@@ -51,7 +51,7 @@ public class RobotContainer {
         // The robot's subsystems and commands are defined here...
 
         //private final SwerveSubsystem drivebase = new SwerveSubsystem();
-        // private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+        private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
         //private final SelectorSubsystem selectorSubsystem = new SelectorSubsystem(shoulderSubsystem, elevatorSubsystem,wristSubsystem);
         private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
         private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem();
@@ -146,7 +146,16 @@ public class RobotContainer {
                 //new Trigger(driverController::getRightBumperButton).whileTrue(driveRobotOriented);
                 new JoystickButton(driverController, XboxController.Button.kA.value)
                         .whileTrue(new ShooterFunctionsCheckCommand(shooterSubsystem));
+                new JoystickButton(driverController, XboxController.Button.kX.value)
+                        .whileTrue(new IntakeElevatorTuner(intakeSubsystem, 0.05));
+                new JoystickButton(driverController, XboxController.Button.kY.value)
+                        .whileTrue(new IntakeElevatorTuner(intakeSubsystem, -0.05));
+                        
+                new JoystickButton(driverController, XboxController.Button.kLeftBumper.value)
+                        .whileTrue(new IntakeRollerTest(intakeSubsystem));
 
+                
+                
                 //Intake bindings
                 // new JoystickButton (auxController, XboxController.Button.kA.value)
                 //         .whileTrue(new RollerInCommand(intakeSubsystem));
@@ -170,6 +179,7 @@ public class RobotContainer {
                 ShuffleboardLayout swerveTests = functionsCheckTab.getLayout("Swerve", BuiltInLayouts.kList).withSize(2,4).withProperties(Map.of("Label position", "HIDDEN")); 
 
                 functionsCheckTab.add(new ShooterFunctionsCheckCommand(shooterSubsystem));
+
 
         }
 
@@ -249,7 +259,7 @@ public class RobotContainer {
          * @return True if manual, false if automatic
          */
         private boolean getManualSwitch() {
-                return driverStation.getRawButtonPressed(7);
+                return !driverStation.getRawButtonPressed(7);
         }
 
         /**

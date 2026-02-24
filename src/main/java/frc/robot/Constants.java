@@ -26,10 +26,26 @@ public final class Constants {
 
   }
 
+  public static class DriverStationConstants {
+    public static final int TOP_LEFT = 1; // ELEV OUT
+    public static final int TOP_MIDDLE = 9; //CLIMBER UP
+    public static final int TOP_RIGHT = 2; // 
+
+    public static final int MIDDLE_LEFT = 6; // ELEV IN
+    public static final int MIDDLE_MIDDLE = 8; // CLIMB DOWN
+    public static final int MIDDLE_RIGHT = 3; // SELF DESTRUCT
+
+    public static final int BOTTOM_LEFT = 5; //SHOOT
+    public static final int BOTTOM_MIDDLE = 4; // ZERO DRIVE
+    public static final int BOTTOM_RIGHT = 10; //
+
+    public static final int SWITCH = 7; // True when switch is DOWN ------- SPINDEXER
+  }
+
   public static class HardwareConstants {
     public static final int PIGEON_ID = 7;
     
-    public static final int INTAKE_JOINT_ID = 51;
+    public static final int INTAKE_ELEVATOR_ID = 51;
     public static final int INTAKE_ROLLER_ID = 52;
 
     public static final int SHOOTER_LEFT_MOTOR_ID = 61;
@@ -68,6 +84,8 @@ public final class Constants {
     public static final double AUTOMATIC_INTAKE_SPEED = 0.3;
     public static final double MANUAL_INTAKE_SPEED = 0.5;
     public static final double MANUAL_SHUFFLE_SPEED = 0.1; // hold this when going over the bump to ensure balls dont fall out.
+
+    public static final double INTAKING_POSITION = 1;
   }
 
   public static class ClimberConstants {

@@ -24,8 +24,8 @@ import frc.robot.Constants.ShooterConstants;
 
 public class ShooterSubsystem extends SubsystemBase {
 
-  TalonFX shooterMotorMaster;
-  TalonFX shooterMotorSlave;
+  TalonFX ShooterMotorLeader;
+  TalonFX ShooterMotorFollower;
 
   //ShuffleboardTab functionsCheckTab = Shuffleboard.getTab("Functions Check");
 
@@ -42,33 +42,34 @@ public class ShooterSubsystem extends SubsystemBase {
 
   /** Creates a new ShooterSubsystem. */
   public ShooterSubsystem() {
-    this.shooterMotorMaster = new TalonFX(HardwareConstants.SHOOTER_LEFT_MOTOR_ID, HardwareConstants.CANBUS);
-    this.shooterMotorSlave = new TalonFX(HardwareConstants.SHOOTER_RIGHT_MOTOR_ID, HardwareConstants.CANBUS);
+    this.ShooterMotorLeader = new TalonFX(HardwareConstants.SHOOTER_LEFT_MOTOR_ID, HardwareConstants.CANBUS);
+    this.ShooterMotorFollower = new TalonFX(HardwareConstants.SHOOTER_RIGHT_MOTOR_ID, HardwareConstants.CANBUS);
 
-    shooterMotorSlave.setControl(new Follower(HardwareConstants.SHOOTER_LEFT_MOTOR_ID, MotorAlignmentValue.Aligned)); //sets the slave motor to follow the master motor movement
+    System.out.println("STATUS OF MOTOR FOLLOWING: " + ShooterMotorFollower.setControl(new Follower(HardwareConstants.SHOOTER_LEFT_MOTOR_ID, MotorAlignmentValue.Aligned))); //sets the slave motor to follow the master motor movement
     
     SmartDashboard.putNumber("motor-test-speed", ShooterConstants.TESTING_SPEED);
     
   }
 
   public void spinUp(double speed){
-    shooterMotorMaster.set(spinUpController.calculate(shooterMotorMaster.getVelocity().getValueAsDouble() / HardwareConstants.KRAKEN_RPS, speed));
+    ShooterMotorLeader.set(spinUpController.calculate(ShooterMotorLeader.getVelocity().getValueAsDouble() / HardwareConstants.KRAKEN_RPS, speed));
   }
 
   public void testLinkage(){
-    shooterMotorMaster.set(-0.5);
+    ShooterMotorLeader.set(-0.5);
     System.out.println("-------------------- TESTING LINKAGE ------------------------");
     System.out.println(SmartDashboard.getNumber("motor-test-speed", 0));
     
   }
   
   public void stop(){
-    shooterMotorMaster.set(0);
+    ShooterMotorLeader.set(0);
   }
 
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Shooter speed", ShooterMotorLeader.get());
   }
 }

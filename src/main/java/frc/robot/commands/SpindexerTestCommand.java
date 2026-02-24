@@ -8,11 +8,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.SpindexerSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class SpindexerCommand extends Command {
+public class SpindexerTestCommand extends Command {
 
   SpindexerSubsystem spindexerSubsystem;
   /** Creates a new SpindexerCommand. */
-  public SpindexerCommand(SpindexerSubsystem spindexerSubsystem) {
+  public SpindexerTestCommand(SpindexerSubsystem spindexerSubsystem) {
     this.spindexerSubsystem = spindexerSubsystem;
 
     addRequirements(spindexerSubsystem);
@@ -22,7 +22,7 @@ public class SpindexerCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    spindexerSubsystem.start();
+    spindexerSubsystem.startTest();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
