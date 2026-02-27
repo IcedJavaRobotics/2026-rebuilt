@@ -6,13 +6,18 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.HardwareConstants;
+import frc.robot.Constants.IntakeConstants;
+
 
 public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new IntakeSubsystem. */
+
+  PIDController elevatorPID = new PIDController(0.1, 0, 0);
 
   TalonFX intakeElevatorMotor;
   TalonFX intakeRollerMotor;
@@ -37,6 +42,14 @@ public class IntakeSubsystem extends SubsystemBase {
   }
   public void stopRoller(){
     intakeRollerMotor.set(0);
+  }
+
+  public void goOut(){
+    setIntake(elevatorPID.calculate(getPosition(),IntakeConstants.INTAKING_POSITION));
+  }
+
+  public double getPosition(){
+    return intakeElevatorMotor.getPosition().getValueAsDouble();
   }
 
   @Override
