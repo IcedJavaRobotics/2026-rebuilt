@@ -47,9 +47,9 @@ public class SwerveSubsystem extends SubsystemBase {
   public SwerveSubsystem() {
     try {
       swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.DriverConstants.MAX_SPEED,
-          new Pose2d(new Translation2d(Units.feetToMeters(1),
+          new Pose2d(new Translation2d(Units.feetToMeters(3),
               Units.feetToMeters(4)),
-              Rotation2d.fromDegrees(0))); //TODO: TEST CHANGING THESE VALUES
+              Rotation2d.fromDegrees(180))); //TODO: TEST CHANGING THESE VALUES
               
       // Alternative method if you don't want to supply the conversion factor via JSON
       // files.
@@ -102,7 +102,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
                       
 
-                              this.getSwerveDrive().setGyroOffset(new Rotation3d(0, 0, 180));
+                              //this.getSwerveDrive().setGyro(new Rotation3d(0, 0, 180));
   }
 
   public void resetPose(Pose2d pose) {

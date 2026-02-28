@@ -159,8 +159,9 @@ public class RobotContainer {
                 new JoystickButton(driverController, XboxController.Button.kLeftBumper.value)
                         .whileTrue(new IntakeRollerTest(intakeSubsystem));
 
+
                 
-                spindexerSwitch.onTrue(new SpindexerTestCommand(spindexerSubsystem));
+                spindexerSwitch.onTrue(new SpindexerTestCommand(spindexerSubsystem)); //while the switch is enabled, spin the spindexer at the given speed on smartdashboard
                 
                 new JoystickButton(driverStation, DriverStationConstants.BOTTOM_LEFT)
                         .whileTrue(new ShooterFunctionsCheckCommand(shooterSubsystem));
