@@ -52,7 +52,7 @@ import frc.robot.commands.functionchecks.*;
 public class RobotContainer {
         // The robot's subsystems and commands are defined here...
 
-        //private final SwerveSubsystem drivebase = new SwerveSubsystem();
+        private final SwerveSubsystem drivebase = new SwerveSubsystem();
         private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
         //private final SelectorSubsystem selectorSubsystem = new SelectorSubsystem(shoulderSubsystem, elevatorSubsystem,wristSubsystem);
         private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
@@ -80,8 +80,8 @@ public class RobotContainer {
                 // Configure the trigger bindings
                 headingController.enableContinuousInput(-180, 180);
                 configureBindings();
-                //drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity); 
-
+                drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity); 
+                intakeSubsystem.setDefaultCommand(resetIntake);
                 DriverStation.silenceJoystickConnectionWarning(true);
                 //autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be
                 // `Commands.none()`
@@ -119,18 +119,19 @@ public class RobotContainer {
                 }
         }
 
-        // SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
-        //                 () -> driverController.getLeftY() * getMultiplier(),
-        //                 () -> driverController.getLeftX() * getMultiplier())
-        //                 .withControllerRotationAxis(() -> getRightX())
-        //                 .deadband(getDeadzone())
-        //                 .scaleTranslation(1)// Can be changed to alter speed
-        //                 .allianceRelativeControl(true);
+        SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
+                        () -> driverController.getLeftY() * getMultiplier(),
+                        () -> driverController.getLeftX() * getMultiplier())
+                        .withControllerRotationAxis(() -> getRightX())
+                        .deadband(getDeadzone())
+                        .scaleTranslation(1)// Can be changed to alter speed
+                        .allianceRelativeControl(true);
 
-        // SwerveInputStream driveRobotOrientedVelocity = driveAngularVelocity.copy().robotRelative(true).allianceRelativeControl(false);
+        SwerveInputStream driveRobotOrientedVelocity = driveAngularVelocity.copy().robotRelative(true).allianceRelativeControl(false);
 
-        //Command driveFieldOrientedAngularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
-        //Command driveRobotOriented = drivebase.driveFieldOriented(driveRobotOrientedVelocity);
+        Command driveFieldOrientedAngularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
+        Command driveRobotOriented = drivebase.driveFieldOriented(driveRobotOrientedVelocity);
+        Command resetIntake = intakeSubsystem.resetElevator();
 
         /**
          * Use this method to define your trigger->command mappings. Triggers can be
@@ -165,33 +166,26 @@ public class RobotContainer {
                         .whileTrue(new ShooterFunctionsCheckCommand(shooterSubsystem));
 
                 new JoystickButton(driverStation, DriverStationConstants.TOP_LEFT)
-                        .whileTrue(new IntakeElevatorTuner(intakeSubsystem, 0.05));
+                        .whileTrue(new IntakeElevatorTuner(intakeSubsystem, 0.1));
                 new JoystickButton(driverStation, DriverStationConstants.MIDDLE_LEFT)
-                        .whileTrue(new IntakeElevatorTuner(intakeSubsystem, -0.05));
+                        .whileTrue(new IntakeElevatorTuner(intakeSubsystem, -0.1));
 
                 new JoystickButton(driverStation, DriverStationConstants.TOP_RIGHT)
                         .whileTrue(new IntakeRollerTest(intakeSubsystem));
+
+                new JoystickButton(driverStation, DriverStationConstants.MIDDLE_RIGHT)
+                        .whileTrue(new IntakeHold(intakeSubsystem));
               
+
+                new JoystickButton(driverStation, DriverStationConstants.TOP_MIDDLE)
+                        .whileTrue(new ClimberUp(climberSubsystem));
+                
+                new JoystickButton(driverStation, DriverStationConstants.MIDDLE_MIDDLE)
+                        .whileTrue(new ClimberDown(climberSubsystem));
         }
 
         private void initializeDashboard(){
-                //SmartDashboard.putNumber("Gyro", drivebase.getSwerveDrive().getGyro().getRotation3d().getZ() * (180/Math.PI));
-                //SmartDashboard.putNumber("odometry angle", drivebase.getPose().getRotation().getDegrees());
-
-                // Checking conections
-                ShuffleboardLayout swerveLayout = statusCheckTab.getLayout("Swerve", BuiltInLayouts.kList).withSize(2,4);
-                ShuffleboardLayout motorLayout = statusCheckTab.getLayout("Motors",BuiltInLayouts.kList).withSize(2,4);
-                ShuffleboardLayout miscLayout = statusCheckTab.getLayout("Misc",BuiltInLayouts.kList).withSize(2,4);
-        
-                visionSubsystem.functionsCheck(statusCheckTab);
-                //drivebase.functionsCheck(statusCheckTab);
-                climberSubsystem.functionsCheck(statusCheckTab);
-                //TODO Add motor torque
-
-                // Functions Checks
-                ShuffleboardLayout swerveTests = functionsCheckTab.getLayout("Swerve", BuiltInLayouts.kList).withSize(2,4).withProperties(Map.of("Label position", "HIDDEN")); 
-
-                functionsCheckTab.add(new ShooterFunctionsCheckCommand(shooterSubsystem));
+              
 
 
         }

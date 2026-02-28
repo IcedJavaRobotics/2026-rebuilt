@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.HardwareConstants;
@@ -21,8 +22,8 @@ public class ClimberSubsystem extends SubsystemBase {
     climberMotor = new TalonFX(HardwareConstants.CLIMBER_MOTOR_ID, HardwareConstants.CANBUS);
   }
 
-  public void functionsCheck(ShuffleboardTab statusCheckTab) {
-    statusCheckTab.addDouble("ClimberTorque", () -> getTorque());
+  public void functionsCheck() {
+    SmartDashboard.putNumber("climberTorque", getTorque());
   }
 
   public double getTorque(){
@@ -31,9 +32,20 @@ public class ClimberSubsystem extends SubsystemBase {
     return motorTorque * ClimberConstants.GEAR_RATIO * ClimberConstants.EFFICIENCY;
   }
 
+  public void moveUp(){
+    climberMotor.set(-0.1);
+  }
+  public void moveDown(){
+    climberMotor.set(0.1);
+  }
+  public void stopClimber(){
+    climberMotor.set(0);
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    functionsCheck();
   }
 
 

@@ -51,9 +51,9 @@ public final class Constants {
     public static final int SHOOTER_LEFT_MOTOR_ID = 61;
     public static final int SHOOTER_RIGHT_MOTOR_ID = 62;
 
-    public static final int CLIMBER_MOTOR_ID = 71;
+    public static final int CLIMBER_MOTOR_ID = 55;
 
-    public static final int SPINDEXER_MOTOR_ID = 81;
+    public static final int SPINDEXER_MOTOR_ID = 56;
 
     public static final String CANBUS = "rio";
     public static final String CANIVORE = "iceberg-canivore";
@@ -85,7 +85,7 @@ public final class Constants {
     public static final double MANUAL_INTAKE_SPEED = 0.5;
     public static final double MANUAL_SHUFFLE_SPEED = 0.1; // hold this when going over the bump to ensure balls dont fall out.
 
-    public static final double INTAKING_POSITION = 10;
+    public static final double INTAKING_POSITION = 27;
   }
 
   public static class ClimberConstants {

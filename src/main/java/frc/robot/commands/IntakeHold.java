@@ -25,14 +25,19 @@ public class IntakeHold extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    intakeSubsystem.setRoller(IntakeConstants.AUTOMATIC_INTAKE_SPEED);
+    //intakeSubsystem.setRoller(IntakeConstants.AUTOMATIC_INTAKE_SPEED);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intakeSubsystem.setRoller(IntakeConstants.AUTOMATIC_INTAKE_SPEED);
+    //intakeSubsystem.setRoller(IntakeConstants.AUTOMATIC_INTAKE_SPEED);
     intakeSubsystem.goOut();
+    if(intakeSubsystem.getPosition() >= (IntakeConstants.INTAKING_POSITION-2)){
+      intakeSubsystem.setRollerToTestSpeed();
+    } else{
+      intakeSubsystem.stopRoller();
+    }
   }
 
   // Called once the command ends or is interrupted.
