@@ -85,7 +85,7 @@ public final class Constants {
     public static final double MANUAL_INTAKE_SPEED = 0.5;
     public static final double MANUAL_SHUFFLE_SPEED = 0.1; // hold this when going over the bump to ensure balls dont fall out.
 
-    public static final double INTAKING_POSITION = 27;
+    public static final double INTAKING_POSITION = 34.5;
   }
 
   public static class ClimberConstants {

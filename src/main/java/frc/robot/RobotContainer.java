@@ -161,7 +161,7 @@ public class RobotContainer {
 
 
                 
-                spindexerSwitch.onTrue(new SpindexerTestCommand(spindexerSubsystem)); //while the switch is enabled, spin the spindexer at the given speed on smartdashboard
+                spindexerSwitch.onTrue(new IntakeRollerTest(intakeSubsystem)); //while the switch is enabled, spin the spindexer at the given speed on smartdashboard
                 
                 new JoystickButton(driverStation, DriverStationConstants.BOTTOM_LEFT)
                         .whileTrue(new ShooterFunctionsCheckCommand(shooterSubsystem));
