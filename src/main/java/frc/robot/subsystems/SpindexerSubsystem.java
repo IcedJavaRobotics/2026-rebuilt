@@ -31,7 +31,7 @@ public class SpindexerSubsystem extends SubsystemBase {
     set(SpindexerConstants.MANUAL_NORMAL_SPEED);
   }
   public void startTest(){
-    set(SpindexerConstants.TESTING_SPEED);
+    set(SmartDashboard.getNumber("spindexer-speed", 0));
   }
 
   public void stop(){
@@ -48,7 +48,7 @@ public class SpindexerSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("spindexer-speed", getSpeed());
+    SmartDashboard.putNumber("spindexer-speed", 0.2);
     // This method will be called once per scheduler run
   }
 
