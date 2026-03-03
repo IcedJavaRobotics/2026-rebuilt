@@ -73,7 +73,7 @@ public class IntakeSubsystem extends SubsystemBase {
       intakeRollerMotor.setNeutralMode(NeutralModeValue.Brake);
     }
     if(getPosition() >= 2){
-      intakeElevatorMotor.set(-0.2);
+      intakeElevatorMotor.set(-0.3);
       intakeRollerMotor.setNeutralMode(NeutralModeValue.Coast);
     } else{
       stopIntake();
