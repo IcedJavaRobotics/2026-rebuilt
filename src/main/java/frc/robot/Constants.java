@@ -64,7 +64,7 @@ public final class Constants {
   public static class ShooterConstants {
     public static final double GEAR_RATIO = 1;
     // Speed for functions check without a ball
-    public static final double TESTING_SPEED = 0.15;
+    public static final double TESTING_SPEED = 0.50;
 
     // Manual Mode Shooting distances
     public static final double CLOSE_LAUNCH_SPEED = 0.4;
@@ -85,7 +85,7 @@ public final class Constants {
     public static final double MANUAL_INTAKE_SPEED = 0.5;
     public static final double MANUAL_SHUFFLE_SPEED = 0.1; // hold this when going over the bump to ensure balls dont fall out.
 
-    public static final double INTAKING_POSITION = 34;
+    public static final double INTAKING_POSITION = 33; //34
   }
 
   public static class ClimberConstants {

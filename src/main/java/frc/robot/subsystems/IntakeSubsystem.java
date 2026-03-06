@@ -30,7 +30,7 @@ public class IntakeSubsystem extends SubsystemBase {
     this.intakeElevatorMotor = new TalonFX(HardwareConstants.INTAKE_ELEVATOR_ID, "rio");
     this.intakeRollerMotor = new TalonFX(HardwareConstants.INTAKE_ROLLER_ID, "rio");
 
-    SmartDashboard.putNumber("roller-test-speed", -0.05); //negative is the right way
+    SmartDashboard.putNumber("roller-test-speed", -0.3); //negative is the right way
   } 
 
   public void setIntake(double speed){
@@ -49,6 +49,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public void stopRoller(){
     intakeRollerMotor.set(0);
+  }
+
+  public void zeroMotor(){
+    intakeElevatorMotor.setPosition(0);
   }
 
   public void goOut(){

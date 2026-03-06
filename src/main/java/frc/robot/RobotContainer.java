@@ -149,15 +149,17 @@ public class RobotContainer {
          */
         private void configureBindings() {
                 //new Trigger(driverController::getRightBumperButton).whileTrue(driveRobotOriented);
-                new JoystickButton(driverController, XboxController.Button.kA.value)
-                        .whileTrue(new ShooterFunctionsCheckCommand(shooterSubsystem));
-                new JoystickButton(driverController, XboxController.Button.kX.value)
-                        .whileTrue(new IntakeElevatorTuner(intakeSubsystem, 0.05));
-                new JoystickButton(driverController, XboxController.Button.kY.value)
-                        .whileTrue(new IntakeElevatorTuner(intakeSubsystem, -0.05));
-                        
+                
+                new JoystickButton(driverController, XboxController.Button.kB.value)
+                        .whileTrue(new ZeroGyro(drivebase));  //zero gyro on B
+
+
+
+                new JoystickButton(driverController, XboxController.Button.kRightBumper.value)
+                        .whileTrue(new IntakeHold(intakeSubsystem)); //right bumper = intake
+
                 new JoystickButton(driverController, XboxController.Button.kLeftBumper.value)
-                        .whileTrue(new IntakeRollerTest(intakeSubsystem));
+                        .whileTrue(new ShooterFunctionsCheckCommand(shooterSubsystem));
 
 
                 
@@ -183,6 +185,9 @@ public class RobotContainer {
                 
                 new JoystickButton(driverStation, DriverStationConstants.MIDDLE_MIDDLE)
                         .whileTrue(new ClimberDown(climberSubsystem));
+
+                new JoystickButton(driverStation, DriverStationConstants.BOTTOM_MIDDLE)
+                        .whileTrue(new ZeroIntake(intakeSubsystem));
         }
 
         private void initializeDashboard(){
