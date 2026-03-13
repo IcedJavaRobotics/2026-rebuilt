@@ -23,6 +23,8 @@ import swervelib.SwerveInputStream;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -38,6 +40,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import frc.robot.subsystems.*;
 import frc.robot.commands.*;
+import frc.robot.commands.autocommands.*;
 import frc.robot.commands.functionchecks.*;
 
 /**
@@ -58,6 +61,7 @@ public class RobotContainer {
         private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
         private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem();
         private final VisionSubsystem visionSubsystem = new VisionSubsystem();
+        LimelightSubsystem limelightSubsystem = new LimelightSubsystem();
         private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
 
         //private final SendableChooser<Command> autoChooser;
@@ -72,6 +76,8 @@ public class RobotContainer {
         ShuffleboardTab functionsCheckTab = Shuffleboard.getTab("Functions Check");
 
         Trigger spindexerSwitch = new Trigger( () -> getManualSwitch());
+        Trigger shootingTrigger = new Trigger( () -> getRightAuxTriggerValue());
+        Trigger intakeTrigger = new Trigger( () -> getLeftAuxTriggerValue());
 
         /**
          * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -81,7 +87,7 @@ public class RobotContainer {
                 headingController.enableContinuousInput(-180, 180);
                 configureBindings();
                 drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity); 
-                intakeSubsystem.setDefaultCommand(resetIntake);
+                //intakeSubsystem.setDefaultCommand(resetIntake);
                 DriverStation.silenceJoystickConnectionWarning(true);
                 //autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be
                 // `Commands.none()`
@@ -131,7 +137,7 @@ public class RobotContainer {
 
         Command driveFieldOrientedAngularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
         Command driveRobotOriented = drivebase.driveFieldOriented(driveRobotOrientedVelocity);
-        Command resetIntake = intakeSubsystem.resetElevator();
+        Command resetIntake = intakeSubsystem.resetElevator(() -> getManualSwitch());
 
         /**
          * Use this method to define your trigger->command mappings. Triggers can be
@@ -163,18 +169,18 @@ public class RobotContainer {
 
 
                 
-                spindexerSwitch.onTrue(new IntakeRollerTest(intakeSubsystem)); //while the switch is enabled, spin the spindexer at the given speed on smartdashboard
+                //spindexerSwitch.onTrue(new IntakeRollerTest(intakeSubsystem)); //while the switch is enabled, spin the spindexer at the given speed on smartdashboard
                 
                 new JoystickButton(driverStation, DriverStationConstants.BOTTOM_LEFT)
                         .whileTrue(new ShooterFunctionsCheckCommand(shooterSubsystem));
 
                 new JoystickButton(driverStation, DriverStationConstants.TOP_LEFT)
-                        .whileTrue(new IntakeElevatorTuner(intakeSubsystem, 0.1));
+                        .whileTrue(new IntakeElevatorTuner(intakeSubsystem, 0.3));
                 new JoystickButton(driverStation, DriverStationConstants.MIDDLE_LEFT)
-                        .whileTrue(new IntakeElevatorTuner(intakeSubsystem, -0.1));
+                        .whileTrue(new IntakeElevatorTuner(intakeSubsystem, -0.3));
 
-                new JoystickButton(driverStation, DriverStationConstants.TOP_RIGHT)
-                        .whileTrue(new IntakeRollerTest(intakeSubsystem));
+                // new JoystickButton(driverStation, DriverStationConstants.TOP_RIGHT)
+                //         .whileTrue(new IntakeRollerTest(intakeSubsystem));
 
                 new JoystickButton(driverStation, DriverStationConstants.MIDDLE_RIGHT)
                         .whileTrue(new IntakeHold(intakeSubsystem));
@@ -188,6 +194,31 @@ public class RobotContainer {
 
                 new JoystickButton(driverStation, DriverStationConstants.BOTTOM_MIDDLE)
                         .whileTrue(new ZeroIntake(intakeSubsystem));
+
+                new JoystickButton(driverStation, DriverStationConstants.TOP_RIGHT)
+                        .whileTrue(new ShooterReverse(shooterSubsystem));
+
+
+                new JoystickButton(auxController, XboxController.Button.kY.value)
+                         .whileTrue(new IntakeElevatorTuner(intakeSubsystem, 0.3));
+                new JoystickButton(auxController, XboxController.Button.kB.value)
+                         .whileTrue(new IntakeElevatorTuner(intakeSubsystem, -0.3));
+                new JoystickButton(auxController, XboxController.Button.kA.value)
+                        .whileTrue(new TurnDownShooter(shooterSubsystem));
+                new JoystickButton(auxController, XboxController.Button.kX.value)
+                        .whileTrue(new TurnUpShooter(shooterSubsystem));
+                
+                new JoystickButton(auxController, XboxController.Button.kRightBumper.value)
+                        .whileTrue(new ShooterReverse(shooterSubsystem));
+                new JoystickButton(auxController, XboxController.Button.kStart.value)
+                        .whileTrue(new ClimberUp(climberSubsystem));
+                new JoystickButton(auxController, XboxController.Button.kBack.value)
+                        .whileTrue(new ClimberDown(climberSubsystem));
+
+                shootingTrigger.whileTrue(new ShooterFunctionsCheckCommand(shooterSubsystem));
+                intakeTrigger.whileTrue(new IntakeHold(intakeSubsystem));
+
+                
         }
 
         private void initializeDashboard(){
@@ -303,6 +334,23 @@ public class RobotContainer {
          */
         public Command getAutonomousCommand() {
                 //return autoChooser.getSelected();
-                 return null;
+                 //return new ShooterFunctionsCheckCommand(shooterSubsystem);
+                 return new SequentialCommandGroup(
+                        new TurnOnShooter(shooterSubsystem),
+                        new SetIntakeOut(intakeSubsystem),
+                        new WaitCommand(1),
+                        new SetIntakeIn(intakeSubsystem),
+                        new WaitCommand(0.7),
+                        new SetIntakeOut(intakeSubsystem),
+                        new WaitCommand(0.7),
+                        new SetIntakeIn(intakeSubsystem),
+                        new WaitCommand(0.7),
+                        new SetIntakeOut(intakeSubsystem),
+                        new WaitCommand(0.7),
+                        new SetIntakeIn(intakeSubsystem),
+                        new WaitCommand(0.7),
+                        new SetIntakeOff(intakeSubsystem),
+                        new TurnOffShooter(shooterSubsystem)
+                 );
         }
 }

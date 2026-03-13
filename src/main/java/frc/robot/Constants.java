@@ -47,6 +47,7 @@ public final class Constants {
     
     public static final int INTAKE_ELEVATOR_ID = 51;
     public static final int INTAKE_ROLLER_ID = 52;
+    public static final int INTAKE_ELEVATOR_FOLLOWER_ID = 53;
 
     public static final int SHOOTER_LEFT_MOTOR_ID = 61;
     public static final int SHOOTER_RIGHT_MOTOR_ID = 62;
@@ -64,7 +65,7 @@ public final class Constants {
   public static class ShooterConstants {
     public static final double GEAR_RATIO = 1;
     // Speed for functions check without a ball
-    public static final double TESTING_SPEED = 0.50;
+    public static final double TESTING_SPEED = 0.75;
 
     // Manual Mode Shooting distances
     public static final double CLOSE_LAUNCH_SPEED = 0.4;
@@ -85,7 +86,7 @@ public final class Constants {
     public static final double MANUAL_INTAKE_SPEED = 0.5;
     public static final double MANUAL_SHUFFLE_SPEED = 0.1; // hold this when going over the bump to ensure balls dont fall out.
 
-    public static final double INTAKING_POSITION = 33; //34
+    public static final double INTAKING_POSITION = 31; //34
   }
 
   public static class ClimberConstants {
@@ -101,6 +102,20 @@ public final class Constants {
     public static final String LIMELIGHT_IP = "http://10.68.94.11:5801/";
 
     
+  }
+
+    public static final class LimelightConstants {
+    /** upward angle of limelight camera [degrees] */
+    public static final double LIMELIGHT_ANGLE = 3.0;
+    /** distance from limelight lens from floor [inches] */
+    public static final double LIMELIGHT_HEIGHT = 18.5;
+    /** distance from apriltag to floor(bottom of tag) [inches] */
+    public static final double APRILTAG_HEIGHT = 14.25;
+    /**
+     * distance from apriltag to floor but its the double substation(bottom of tag)
+     * [inches]
+     */
+    public static final double APRILTAG_DOUBLE_SUBSTATION_HEIGHT = 23.375;
   }
 
   public static class PhysicsConstants {

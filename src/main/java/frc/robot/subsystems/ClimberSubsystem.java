@@ -33,10 +33,16 @@ public class ClimberSubsystem extends SubsystemBase {
   }
 
   public void moveUp(){
-    climberMotor.set(-0.2);
+    //if(climberMotor.getPosition().getValueAsDouble() <= -380){
+      climberMotor.set(-1);
+    
   }
   public void moveDown(){
-    climberMotor.set(0.2);
+    //if(climberMotor.getPosition().getValueAsDouble() <= 0){
+    climberMotor.set(1);
+    //} else{
+    //   climberMotor.set(0);
+    // }
   }
   public void stopClimber(){
     climberMotor.set(0);
@@ -44,6 +50,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("climber encoder", climberMotor.getPosition().getValueAsDouble());
     // This method will be called once per scheduler run
     functionsCheck();
   }

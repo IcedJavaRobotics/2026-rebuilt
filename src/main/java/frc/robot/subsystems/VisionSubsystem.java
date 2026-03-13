@@ -29,6 +29,7 @@ public class VisionSubsystem extends SubsystemBase {
   }
 
   public void setupVisionTab(){
+    
     //Add camera connections to the vision tab as well
     //Add all camera POVs as well as the main camera and the pose estimator.
   }

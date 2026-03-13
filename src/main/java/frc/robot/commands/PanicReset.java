@@ -2,20 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.functionchecks;
+package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class ShooterFunctionsCheckCommand extends Command {
-  /** Creates a new ShooterFunctionsCheckCommand. */
-  ShooterSubsystem shooterSubsystem;
-  public ShooterFunctionsCheckCommand(ShooterSubsystem shooterSubsystem) {
-    this.shooterSubsystem = shooterSubsystem;
-    addRequirements(shooterSubsystem);
-
-
+public class PanicReset extends Command {
+  IntakeSubsystem intakeSubsystem;
+  /** Creates a new PanicReset. */
+  public PanicReset(IntakeSubsystem intakeSubsystem) {
+    this.intakeSubsystem = intakeSubsystem;
+    addRequirements(intakeSubsystem);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -26,13 +24,12 @@ public class ShooterFunctionsCheckCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    System.out.println("executing command");
-    shooterSubsystem.startShooting();
+    intakeSubsystem.panicReset();
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {shooterSubsystem.stop();}
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

@@ -4,8 +4,12 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -23,14 +27,21 @@ public class IntakeSubsystem extends SubsystemBase {
   PIDController elevatorPID = new PIDController(0.03, 0, 0);
 
   TalonFX intakeElevatorMotor;
+  TalonFX intakeElevatorFollower;
+
   TalonFX intakeRollerMotor;
+
 
   public IntakeSubsystem() {
 
     this.intakeElevatorMotor = new TalonFX(HardwareConstants.INTAKE_ELEVATOR_ID, "rio");
     this.intakeRollerMotor = new TalonFX(HardwareConstants.INTAKE_ROLLER_ID, "rio");
+    this.intakeElevatorFollower = new TalonFX(HardwareConstants.INTAKE_ELEVATOR_FOLLOWER_ID, "rio");
 
-    SmartDashboard.putNumber("roller-test-speed", -0.3); //negative is the right way
+     System.out.println("STATUS OF INTAKE MOTOR FOLLOWING: " + intakeElevatorFollower.setControl(new Follower(HardwareConstants.INTAKE_ELEVATOR_ID, MotorAlignmentValue.Aligned))); 
+    
+
+    SmartDashboard.putNumber("roller-test-speed", -0.35); //negative is the right way
   } 
 
   public void setIntake(double speed){
@@ -72,22 +83,32 @@ public class IntakeSubsystem extends SubsystemBase {
     return intakeElevatorMotor.getPosition().getValueAsDouble();
   }
 
-  private void defaultReset(){
-    if(getPosition() >= 8){
+  private void defaultReset(BooleanSupplier switchStatus){
+    if(switchStatus.getAsBoolean() == false){ //if the intake back switch is off
+      intakeRollerMotor.set(0);
+      System.out.println("AUTO INTAKE OFF");
+    }else{
+    if(getPosition() >= 12){
       intakeRollerMotor.setNeutralMode(NeutralModeValue.Brake);
+      intakeElevatorMotor.set(-0.4);
     }
-    if(getPosition() >= 2){
-      intakeElevatorMotor.set(-0.3);
+    if(getPosition() >= 1){
+      intakeElevatorMotor.set(0);
       intakeRollerMotor.setNeutralMode(NeutralModeValue.Coast);
     } else{
       stopIntake();
       intakeRollerMotor.setNeutralMode(NeutralModeValue.Brake);
     }
   }
+  }
 
-  public Command resetElevator(){
+  public void panicReset(){
+    intakeElevatorMotor.set(elevatorPID.calculate(intakeElevatorMotor.getPosition().getValueAsDouble(), 3));
+  }
+
+  public Command resetElevator(BooleanSupplier switchStatus){
       return run(() -> {
-        this.defaultReset();
+        this.defaultReset(switchStatus);
       });
   }
 
