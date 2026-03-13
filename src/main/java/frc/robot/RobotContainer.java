@@ -17,8 +17,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-// import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -38,11 +36,15 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
+// import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.*;
 import frc.robot.commands.*;
 import frc.robot.commands.autocommands.*;
 import frc.robot.commands.functionchecks.*;
+
+import java.util.Date;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -81,17 +83,21 @@ public class RobotContainer {
 
         PIDController headingController = new PIDController(0.015, 0, 0.001); // PID for making robot automatically face the hub
 
+        private String formattedTime = "hi";
 
         /**
          * The container for the robot. Contains subsystems, OI devices, and commands.
          */
         public RobotContainer() {
+
                 // Configure the trigger bindings
-                headingController.enableContinuousInput(-180, 180);
+                headingController.enableContinuousInput(-180, 180); //Causes the pid for heading to loop along with the gyro
                 configureBindings();
+
+                // Setup default commands
                 driveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity); 
                 intakeSubsystem.setDefaultCommand(resetIntake);     //.onlyIf(switchEnabled));
-                DriverStation.silenceJoystickConnectionWarning(true);
+     
                 //autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be
                 // `Commands.none()`
                 //SmartDashboard.putData("AutoSelec", autoChooser);
@@ -227,12 +233,6 @@ public class RobotContainer {
                 
         }
 
-        private void initializeDashboard(){
-              
-
-
-        }
-
         private boolean isRobotRelative(){
                 if(driverController.getRightBumperButton()){
                         return true;
@@ -334,6 +334,41 @@ public class RobotContainer {
         private double getControllerRotation() {
                 return driverController.getRightX() * getTurnMultiplier();     
         }
+
+        /**
+         * Sets up the Smartdashboard by adding all the values we will monitor on there
+         */
+        private void initializeDashboard(){
+                setupDriverstation();
+        }
+
+        /**
+         * Sets up various things of the driver station
+         * - Silences joystick warnings
+         * - 
+         */
+        private void setupDriverstation(){
+                DriverStation.silenceJoystickConnectionWarning(true);
+                SmartDashboard.putNumber("Match Number", DriverStation.getMatchNumber());
+                SmartDashboard.putString("Match type", DriverStation.getMatchType().toString());
+                SmartDashboard.putString("Alliance", DriverStation.getAlliance().get().toString());
+                SmartDashboard.putString("Competition", DriverStation.getEventName());
+                SmartDashboard.putNumber("Time left", DriverStation.getMatchTime());
+
+                // Adds time booted to the dashboard
+                Date currentDate = new Date();
+                LocalTime currentTime = LocalTime.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+                formattedTime = currentTime.format(formatter);
+        }
+
+        /**
+         * runs periodically to update the dashboards info with info that continuously updates
+         */
+        private void updateDashboard(){
+                SmartDashboard.putNumber("Time left", DriverStation.getMatchTime());
+        }
+
 
         /**
          * Use this to pass the autonomous command to the main {@link Robot} class.
