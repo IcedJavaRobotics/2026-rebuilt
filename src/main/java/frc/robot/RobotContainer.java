@@ -106,33 +106,6 @@ public class RobotContainer {
                 System.out.println("switch: " + getSwitch());
         }
 
-        private double getDeadzone() {
-                return DriverConstants.DEADBAND;
-        }
-
-        private double getLeftX() {
-                return -driverController.getLeftX();
-        }
-
-        private double getLeftY() {
-                return -driverController.getLeftY();
-        }
-        private double getMultiplier(){
-                if(driverController.getLeftStickButton()){
-                        return 1;
-                } else if(getLeftDriverTriggerValue()){
-                        return 0.4;
-                }
-                return 0.5;
-        }
-
-        private double getTurnMultiplier(){
-                if(driverController.getRightStickButton()){
-                        return 1;
-                } else{
-                        return 0.5;
-                }
-        }
 
         SwerveInputStream driveAngularVelocity = SwerveInputStream.of(driveSubsystem.getSwerveDrive(),
                         () -> driverController.getLeftY() * getMultiplier(),
@@ -163,74 +136,194 @@ public class RobotContainer {
          * joysticks}.
          */
         private void configureBindings() {
-                //new Trigger(driverController::getRightBumperButton).whileTrue(driveRobotOriented);
+
+                // ----------------------- MAIN DRIVER CONTROLS ----------------------------------------------------------------------
+
+                // Left bumper causes straightforward driving
+                new Trigger(driverController::getRightBumperButton).whileTrue(driveRobotOriented);
                 
+                // B button causes the driver to zero their controller
                 new JoystickButton(driverController, XboxController.Button.kB.value)
                         .whileTrue(new ZeroGyro(driveSubsystem));  //zero gyro on B
-
-
-
-                new JoystickButton(driverController, XboxController.Button.kRightBumper.value)
-                        .whileTrue(new IntakeHold(intakeSubsystem)); //right bumper = intake
-
-                new JoystickButton(driverController, XboxController.Button.kLeftBumper.value)
-                        .whileTrue(new ShooterFunctionsCheckCommand(shooterSubsystem));
-
-
                 
-                //manualSwitch.onTrue(new IntakeRollerTest(intakeSubsystem)); //while the switch is enabled, spin the spindexer at the given speed on smartdashboard
-                
-                new JoystickButton(driverStation, DriverStationConstants.BOTTOM_LEFT)
-                        .whileTrue(new ShooterFunctionsCheckCommand(shooterSubsystem));
 
-                new JoystickButton(driverStation, DriverStationConstants.TOP_LEFT)
-                        .whileTrue(new IntakeElevatorTuner(intakeSubsystem, 0.3));
-                new JoystickButton(driverStation, DriverStationConstants.MIDDLE_LEFT)
-                        .whileTrue(new IntakeElevatorTuner(intakeSubsystem, -0.3));
+                // ----------------------- AUX DRIVER CONTROLS -----------------------------------------------------------------------
 
-                // new JoystickButton(driverStation, DriverStationConstants.TOP_RIGHT)
-                //         .whileTrue(new IntakeRollerTest(intakeSubsystem));
-
-                new JoystickButton(driverStation, DriverStationConstants.MIDDLE_RIGHT)
-                        .whileTrue(new IntakeHold(intakeSubsystem));
-              
-
-                new JoystickButton(driverStation, DriverStationConstants.TOP_MIDDLE)
-                        .whileTrue(new ClimberUp(climberSubsystem));
-                
-                new JoystickButton(driverStation, DriverStationConstants.MIDDLE_MIDDLE)
-                        .whileTrue(new ClimberDown(climberSubsystem));
-
-                new JoystickButton(driverStation, DriverStationConstants.BOTTOM_MIDDLE)
-                        .whileTrue(new ZeroIntake(intakeSubsystem));
-
-                new JoystickButton(driverStation, DriverStationConstants.TOP_RIGHT)
-                        .whileTrue(new ShooterReverse(shooterSubsystem));
-
-
+                // Elevator Out
                 new JoystickButton(auxController, XboxController.Button.kY.value)
                          .whileTrue(new IntakeElevatorTuner(intakeSubsystem, 0.3));
+                // Elevator In
                 new JoystickButton(auxController, XboxController.Button.kB.value)
                          .whileTrue(new IntakeElevatorTuner(intakeSubsystem, -0.3));
+                // Shooter Power down
                 new JoystickButton(auxController, XboxController.Button.kA.value)
                         .whileTrue(new TurnDownShooter(shooterSubsystem));
+                // Shooter Power up
                 new JoystickButton(auxController, XboxController.Button.kX.value)
                         .whileTrue(new TurnUpShooter(shooterSubsystem));
-                
+                // Shooter Reverse
                 new JoystickButton(auxController, XboxController.Button.kRightBumper.value)
                         .whileTrue(new ShooterReverse(shooterSubsystem));
+                // Climber Up
                 new JoystickButton(auxController, XboxController.Button.kStart.value)
                         .whileTrue(new ClimberUp(climberSubsystem));
+                // Climber Down
                 new JoystickButton(auxController, XboxController.Button.kBack.value)
                         .whileTrue(new ClimberDown(climberSubsystem));
 
-                //manualSwitch.whileTrue(new ShooterReverse(shooterSubsystem));
+                
 
-                SmartDashboard.putBoolean("auto intake inward", true);
+                // ----------------------- BUTTON BOARD CONTROLS ----------------------------------------------------------------------
+                
+                // Shooter Functions Check (Starts shooter)
+               new JoystickButton(driverStation, DriverStationConstants.BOTTOM_LEFT)
+                        .whileTrue(new ShooterFunctionsCheckCommand(shooterSubsystem));
+                // Elevator Out
+                new JoystickButton(driverStation, DriverStationConstants.TOP_LEFT)
+                        .whileTrue(new IntakeElevatorTuner(intakeSubsystem, 0.3));
+                // Elevator In
+                new JoystickButton(driverStation, DriverStationConstants.MIDDLE_LEFT)
+                        .whileTrue(new IntakeElevatorTuner(intakeSubsystem, -0.3));
+                // Full intake command (Holding makes intake elevator and rollers start, letting go resets)
+                new JoystickButton(driverStation, DriverStationConstants.MIDDLE_RIGHT)
+                        .whileTrue(new IntakeHold(intakeSubsystem));
+                // Climber Up
+                new JoystickButton(driverStation, DriverStationConstants.TOP_MIDDLE)
+                        .whileTrue(new ClimberUp(climberSubsystem));
+                // Climber Down
+                new JoystickButton(driverStation, DriverStationConstants.MIDDLE_MIDDLE)
+                        .whileTrue(new ClimberDown(climberSubsystem));
+                // Zeroes the intake
+                new JoystickButton(driverStation, DriverStationConstants.BOTTOM_MIDDLE)
+                        .whileTrue(new ZeroIntake(intakeSubsystem));
+                // Shooter Reverse
+                new JoystickButton(driverStation, DriverStationConstants.TOP_RIGHT)
+                        .whileTrue(new ShooterReverse(shooterSubsystem));
+                // Starts shooter
                 shootingTrigger.whileTrue(new ShooterFunctionsCheckCommand(shooterSubsystem));
+                // Full intake command (Holding makes intake elevator and rollers start, letting go resets)
                 intakeTrigger.whileTrue(new IntakeHold(intakeSubsystem));
 
                 
+        }
+
+        /**
+         * Sets up the Smartdashboard by adding all the values we will monitor on there
+         */
+        private void initializeDashboard(){
+                setupDriverstation();
+                
+                // Switches
+                SmartDashboard.putBoolean("auto intake inward", true);
+        }
+
+        /**
+         * Sets up various things of the driver station
+         * - Silences joystick warnings
+         * - 
+         */
+        private void setupDriverstation(){
+                DriverStation.silenceJoystickConnectionWarning(true);
+                SmartDashboard.putNumber("Match Number", DriverStation.getMatchNumber());
+                SmartDashboard.putString("Match type", DriverStation.getMatchType().toString());
+                SmartDashboard.putString("Alliance", DriverStation.getAlliance().get().toString());
+                SmartDashboard.putString("Competition", DriverStation.getEventName());
+                SmartDashboard.putNumber("Time left", DriverStation.getMatchTime());
+
+                // Adds time booted to the dashboard
+                Date currentDate = new Date();
+                LocalTime currentTime = LocalTime.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+                formattedTime = currentTime.format(formatter);
+        }
+
+        /**
+         * runs periodically to update the dashboards info with info that continuously updates
+         */
+        private void updateDashboard(){
+                SmartDashboard.putNumber("Time left", DriverStation.getMatchTime());
+        }
+
+
+        /**
+         * Use this to pass the autonomous command to the main {@link Robot} class.
+         *
+         * @return the command to run in autonomous
+         */
+        public Command getAutonomousCommand() { 
+                //return autoChooser.getSelected(); 
+                 return new SequentialCommandGroup(
+                        new TurnOnShooter(shooterSubsystem),
+                        new SetIntakeOut(intakeSubsystem),
+                        new WaitCommand(1),
+                        new SetIntakeIn(intakeSubsystem),
+                        new WaitCommand(0.7),
+                        new SetIntakeOut(intakeSubsystem),
+                        new WaitCommand(0.7),
+                        new SetIntakeIn(intakeSubsystem),
+                        new WaitCommand(0.7),
+                        new SetIntakeOut(intakeSubsystem),
+                        new WaitCommand(0.7),
+                        new SetIntakeIn(intakeSubsystem),
+                        new WaitCommand(0.7),
+                        new SetIntakeOff(intakeSubsystem),
+                        new TurnOffShooter(shooterSubsystem)
+                 );
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // ----------------------------------------------------------------------------------------------------------------------------------------
+        // --------------------------UTILITY METHODS FOR THE CONTROLLERS---------------------------------------------------------------------------
+        // ----------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+                
+        private double getDeadzone() {
+                return DriverConstants.DEADBAND;
+        }
+
+        private double getLeftX() {
+                return -driverController.getLeftX();
+        }
+
+        private double getLeftY() {
+                return -driverController.getLeftY();
+        }
+        private double getMultiplier(){
+                if(driverController.getLeftStickButton()){
+                        return 1;
+                } else if(getLeftDriverTriggerValue()){
+                        return 0.4;
+                }
+                return 0.5;
+        }
+
+        private double getTurnMultiplier(){
+                if(driverController.getRightStickButton()){
+                        return 1;
+                } else{
+                        return 0.5;
+                }
         }
 
         private boolean isRobotRelative(){
@@ -333,67 +426,5 @@ public class RobotContainer {
 
         private double getControllerRotation() {
                 return driverController.getRightX() * getTurnMultiplier();     
-        }
-
-        /**
-         * Sets up the Smartdashboard by adding all the values we will monitor on there
-         */
-        private void initializeDashboard(){
-                setupDriverstation();
-        }
-
-        /**
-         * Sets up various things of the driver station
-         * - Silences joystick warnings
-         * - 
-         */
-        private void setupDriverstation(){
-                DriverStation.silenceJoystickConnectionWarning(true);
-                SmartDashboard.putNumber("Match Number", DriverStation.getMatchNumber());
-                SmartDashboard.putString("Match type", DriverStation.getMatchType().toString());
-                SmartDashboard.putString("Alliance", DriverStation.getAlliance().get().toString());
-                SmartDashboard.putString("Competition", DriverStation.getEventName());
-                SmartDashboard.putNumber("Time left", DriverStation.getMatchTime());
-
-                // Adds time booted to the dashboard
-                Date currentDate = new Date();
-                LocalTime currentTime = LocalTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-                formattedTime = currentTime.format(formatter);
-        }
-
-        /**
-         * runs periodically to update the dashboards info with info that continuously updates
-         */
-        private void updateDashboard(){
-                SmartDashboard.putNumber("Time left", DriverStation.getMatchTime());
-        }
-
-
-        /**
-         * Use this to pass the autonomous command to the main {@link Robot} class.
-         *
-         * @return the command to run in autonomous
-         */
-        public Command getAutonomousCommand() {
-                //return autoChooser.getSelected();
-                 //return new ShooterFunctionsCheckCommand(shooterSubsystem);
-                 return new SequentialCommandGroup(
-                        new TurnOnShooter(shooterSubsystem),
-                        new SetIntakeOut(intakeSubsystem),
-                        new WaitCommand(1),
-                        new SetIntakeIn(intakeSubsystem),
-                        new WaitCommand(0.7),
-                        new SetIntakeOut(intakeSubsystem),
-                        new WaitCommand(0.7),
-                        new SetIntakeIn(intakeSubsystem),
-                        new WaitCommand(0.7),
-                        new SetIntakeOut(intakeSubsystem),
-                        new WaitCommand(0.7),
-                        new SetIntakeIn(intakeSubsystem),
-                        new WaitCommand(0.7),
-                        new SetIntakeOff(intakeSubsystem),
-                        new TurnOffShooter(shooterSubsystem)
-                 );
         }
 }
