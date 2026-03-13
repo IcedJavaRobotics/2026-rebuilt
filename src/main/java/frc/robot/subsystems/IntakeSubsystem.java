@@ -102,9 +102,10 @@ public class IntakeSubsystem extends SubsystemBase {
   //     intakeRollerMotor.setNeutralMode(NeutralModeValue.Brake);
   //   }
   // }
-      if(runing){
+      if(SmartDashboard.getBoolean("auto intake inward", false)){
       System.out.println("running default command as intended master");
       } 
+      System.out.println(SmartDashboard.getBoolean("auto intake inward", false));
   
   }
 

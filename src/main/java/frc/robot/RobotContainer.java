@@ -90,7 +90,7 @@ public class RobotContainer {
                 headingController.enableContinuousInput(-180, 180);
                 configureBindings();
                 driveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity); 
-                intakeSubsystem.setDefaultCommand(resetIntake.onlyIf(switchEnabled));
+                intakeSubsystem.setDefaultCommand(resetIntake);     //.onlyIf(switchEnabled));
                 DriverStation.silenceJoystickConnectionWarning(true);
                 //autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be
                 // `Commands.none()`
@@ -220,6 +220,7 @@ public class RobotContainer {
 
                 //manualSwitch.whileTrue(new ShooterReverse(shooterSubsystem));
 
+                SmartDashboard.putBoolean("auto intake inward", true);
                 shootingTrigger.whileTrue(new ShooterFunctionsCheckCommand(shooterSubsystem));
                 intakeTrigger.whileTrue(new IntakeHold(intakeSubsystem));
 
@@ -326,7 +327,7 @@ public class RobotContainer {
                         
                 }
                 
-                System.out.println("switch: " + getSwitch());
+                //System.out.println("switch: " + getSwitch());
                 return getControllerRotation();
         }
 
