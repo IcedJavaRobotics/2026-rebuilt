@@ -13,9 +13,11 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.Constants.IntakeConstants;
@@ -83,32 +85,36 @@ public class IntakeSubsystem extends SubsystemBase {
     return intakeElevatorMotor.getPosition().getValueAsDouble();
   }
 
-  private void defaultReset(BooleanSupplier switchStatus){
-    if(switchStatus.getAsBoolean() == false){ //if the intake back switch is off
-      intakeRollerMotor.set(0);
-      System.out.println("AUTO INTAKE OFF");
-    }else{
-    if(getPosition() >= 12){
-      intakeRollerMotor.setNeutralMode(NeutralModeValue.Brake);
-      intakeElevatorMotor.set(-0.4);
-    }
-    if(getPosition() >= 1){
-      intakeElevatorMotor.set(0);
-      intakeRollerMotor.setNeutralMode(NeutralModeValue.Coast);
-    } else{
-      stopIntake();
-      intakeRollerMotor.setNeutralMode(NeutralModeValue.Brake);
-    }
-  }
+  private void defaultReset(boolean runing){
+  //   if(switchStatus.getAsBoolean() == false){ //if the intake back switch is off
+  //     intakeRollerMotor.set(0);
+  //     System.out.println("AUTO INTAKE OFF");
+  //   }else{
+  //   if(getPosition() >= 12){
+  //     intakeRollerMotor.setNeutralMode(NeutralModeValue.Brake);
+  //     intakeElevatorMotor.set(-0.4);
+  //   }
+  //   if(getPosition() >= 1){
+  //     intakeElevatorMotor.set(0);
+  //     intakeRollerMotor.setNeutralMode(NeutralModeValue.Coast);
+  //   } else{
+  //     stopIntake();
+  //     intakeRollerMotor.setNeutralMode(NeutralModeValue.Brake);
+  //   }
+  // }
+      if(runing){
+      System.out.println("running default command as intended master");
+      } 
+  
   }
 
   public void panicReset(){
     intakeElevatorMotor.set(elevatorPID.calculate(intakeElevatorMotor.getPosition().getValueAsDouble(), 3));
   }
 
-  public Command resetElevator(BooleanSupplier switchStatus){
+  public Command resetElevator(BooleanSupplier supplier){
       return run(() -> {
-        this.defaultReset(switchStatus);
+          this.defaultReset(supplier.getAsBoolean());
       });
   }
 
@@ -118,4 +124,5 @@ public class IntakeSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("elevatorEncoder", intakeElevatorMotor.getPosition().getValueAsDouble());
     
   }
+
 }

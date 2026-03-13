@@ -32,6 +32,7 @@ import swervelib.SwerveInputStream;
 
 import java.io.ObjectInputFilter.Status;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -53,31 +54,33 @@ import frc.robot.commands.functionchecks.*;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-        // The robot's subsystems and commands are defined here...
 
-        private final SwerveSubsystem drivebase = new SwerveSubsystem();
+        // initialize subsystems
+        private final SwerveSubsystem driveSubsystem = new SwerveSubsystem();
         private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-        //private final SelectorSubsystem selectorSubsystem = new SelectorSubsystem(shoulderSubsystem, elevatorSubsystem,wristSubsystem);
         private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
         private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem();
         private final VisionSubsystem visionSubsystem = new VisionSubsystem();
-        LimelightSubsystem limelightSubsystem = new LimelightSubsystem();
+        private final LimelightSubsystem limelightSubsystem = new LimelightSubsystem();
         private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
 
-        //private final SendableChooser<Command> autoChooser;
-
-        XboxController driverController = new XboxController(DriverConstants.MAIN_DRIVER_PORT);
-        XboxController auxController = new XboxController(DriverConstants.AUX_DRIVER_PORT);
+        // Initialize Controllers
+        private final XboxController driverController = new XboxController(DriverConstants.MAIN_DRIVER_PORT);
+        private final XboxController auxController = new XboxController(DriverConstants.AUX_DRIVER_PORT);
         private final Joystick driverStation = new Joystick(DriverConstants.DRIVER_STATION_PORT);
 
-        PIDController headingController = new PIDController(0.015, 0, 0.001);
-
-        ShuffleboardTab statusCheckTab = Shuffleboard.getTab("Status");
-        ShuffleboardTab functionsCheckTab = Shuffleboard.getTab("Functions Check");
-
-        Trigger spindexerSwitch = new Trigger( () -> getManualSwitch());
+        // Triggers for more control
+        JoystickButton manualSwitch = new JoystickButton(driverStation, 7);
+        Trigger shootcontrolSwitch = new Trigger( () -> getSwitch());
         Trigger shootingTrigger = new Trigger( () -> getRightAuxTriggerValue());
         Trigger intakeTrigger = new Trigger( () -> getLeftAuxTriggerValue());
+
+
+        BooleanSupplier switchEnabled = ( () -> getSwitch());
+        //private final SendableChooser<Command> autoChooser;
+
+        PIDController headingController = new PIDController(0.015, 0, 0.001); // PID for making robot automatically face the hub
+
 
         /**
          * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -86,15 +89,15 @@ public class RobotContainer {
                 // Configure the trigger bindings
                 headingController.enableContinuousInput(-180, 180);
                 configureBindings();
-                drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity); 
-                //intakeSubsystem.setDefaultCommand(resetIntake);
+                driveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity); 
+                intakeSubsystem.setDefaultCommand(resetIntake.onlyIf(switchEnabled));
                 DriverStation.silenceJoystickConnectionWarning(true);
                 //autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be
                 // `Commands.none()`
                 //SmartDashboard.putData("AutoSelec", autoChooser);
 
                 initializeDashboard();
-
+                System.out.println("switch: " + getSwitch());
         }
 
         private double getDeadzone() {
@@ -125,7 +128,7 @@ public class RobotContainer {
                 }
         }
 
-        SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
+        SwerveInputStream driveAngularVelocity = SwerveInputStream.of(driveSubsystem.getSwerveDrive(),
                         () -> driverController.getLeftY() * getMultiplier(),
                         () -> driverController.getLeftX() * getMultiplier())
                         .withControllerRotationAxis(() -> getRightX())
@@ -135,9 +138,9 @@ public class RobotContainer {
 
         SwerveInputStream driveRobotOrientedVelocity = driveAngularVelocity.copy().robotRelative(true).allianceRelativeControl(false);
 
-        Command driveFieldOrientedAngularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
-        Command driveRobotOriented = drivebase.driveFieldOriented(driveRobotOrientedVelocity);
-        Command resetIntake = intakeSubsystem.resetElevator(() -> getManualSwitch());
+        Command driveFieldOrientedAngularVelocity = driveSubsystem.driveFieldOriented(driveAngularVelocity);
+        Command driveRobotOriented = driveSubsystem.driveFieldOriented(driveRobotOrientedVelocity);
+        Command resetIntake = intakeSubsystem.resetElevator(() -> getSwitch());
 
         /**
          * Use this method to define your trigger->command mappings. Triggers can be
@@ -157,7 +160,7 @@ public class RobotContainer {
                 //new Trigger(driverController::getRightBumperButton).whileTrue(driveRobotOriented);
                 
                 new JoystickButton(driverController, XboxController.Button.kB.value)
-                        .whileTrue(new ZeroGyro(drivebase));  //zero gyro on B
+                        .whileTrue(new ZeroGyro(driveSubsystem));  //zero gyro on B
 
 
 
@@ -169,7 +172,7 @@ public class RobotContainer {
 
 
                 
-                //spindexerSwitch.onTrue(new IntakeRollerTest(intakeSubsystem)); //while the switch is enabled, spin the spindexer at the given speed on smartdashboard
+                //manualSwitch.onTrue(new IntakeRollerTest(intakeSubsystem)); //while the switch is enabled, spin the spindexer at the given speed on smartdashboard
                 
                 new JoystickButton(driverStation, DriverStationConstants.BOTTOM_LEFT)
                         .whileTrue(new ShooterFunctionsCheckCommand(shooterSubsystem));
@@ -214,6 +217,8 @@ public class RobotContainer {
                         .whileTrue(new ClimberUp(climberSubsystem));
                 new JoystickButton(auxController, XboxController.Button.kBack.value)
                         .whileTrue(new ClimberDown(climberSubsystem));
+
+                //manualSwitch.whileTrue(new ShooterReverse(shooterSubsystem));
 
                 shootingTrigger.whileTrue(new ShooterFunctionsCheckCommand(shooterSubsystem));
                 intakeTrigger.whileTrue(new IntakeHold(intakeSubsystem));
@@ -300,10 +305,11 @@ public class RobotContainer {
 
         /**
          * 
-         * @return True if manual, false if automatic
+         * @return True if up, false if down
          */
-        private boolean getManualSwitch() {
-                return !driverStation.getRawButtonPressed(7);
+        private boolean getSwitch() {
+                SmartDashboard.putBoolean("switch", !manualSwitch.getAsBoolean());
+                return !manualSwitch.getAsBoolean();
         }
 
         /**
@@ -311,7 +317,7 @@ public class RobotContainer {
          * @return Will return the controller input either divided by two or not based on whether you hold the joystick button. If you hold left trigger, it will use the limelight to auto rotate
          */
         private double getRightX() {
-                //SmartDashboard.putNumber("pos rot", drivebase.getSwerveDrive().getPose().getRotation().getDegrees());
+                //SmartDashboard.putNumber("pos rot", driveSubsystem.getSwerveDrive().getPose().getRotation().getDegrees());
                 if(getLeftDriverTriggerValue()){
                 
                                 return getControllerRotation();
@@ -320,6 +326,7 @@ public class RobotContainer {
                         
                 }
                 
+                System.out.println("switch: " + getSwitch());
                 return getControllerRotation();
         }
 
