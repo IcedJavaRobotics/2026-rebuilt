@@ -59,7 +59,7 @@ public final class Constants {
     public static final String CANBUS = "rio";
     public static final String CANIVORE = "iceberg-canivore";
 
-    public static final int KRAKEN_RPS = 520;
+    public static final int KRAKEN_RPS = 520; // max rps
   }
 
   public static class ShooterConstants {
@@ -68,6 +68,7 @@ public final class Constants {
     public static final double DEFAULT_SHOOTER_SPEED = 0.75;
     public static final double REVERSE_SHOOTER_SPEED = -0.6;
     public static final double DESIRED_SPEED_INTERVAL = 0.01;
+    public static final double SHOOTING_DEADZONE = 0.05;
     // Manual Mode Shooting distances
 
 

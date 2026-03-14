@@ -8,16 +8,19 @@ import java.util.Map;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.Constants.ShooterConstants;
@@ -26,6 +29,9 @@ public class ShooterSubsystem extends SubsystemBase {
 
   TalonFX ShooterMotorLeader;
   TalonFX ShooterMotorFollower;
+
+  
+  
 
   double desiredSpeed = ShooterConstants.DEFAULT_SHOOTER_SPEED; 
 
@@ -86,6 +92,13 @@ public class ShooterSubsystem extends SubsystemBase {
    */
   public void reverseShooter(){
     ShooterMotorLeader.set(ShooterConstants.REVERSE_SHOOTER_SPEED);
+  }
+
+  public void checkShooter(){
+    if (ShooterMotorLeader.getVelocity().getValueAsDouble() >= (this.desiredSpeed-ShooterConstants.SHOOTING_DEADZONE)) {
+
+    }
+    
   }
   
 
