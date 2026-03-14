@@ -46,13 +46,23 @@ public class IntakeSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("roller-test-speed", -0.35); //negative is the right way
   } 
 
-  public void setIntake(double speed){
-    intakeElevatorMotor.set(speed);
+  // Elevator
+  public void IntakeElevatorIn(double speed){
+    intakeElevatorMotor.set(Constants.IntakeConstants.INTAKE_ELEVATOR_IN);
+  }
+  public void IntakeElevatorOut(double speed){
+    intakeElevatorMotor.set(Constants.IntakeConstants.INTAKE_ELEVATOR_OUT);
   }
   public void stopIntake(){
     intakeElevatorMotor.set(0);
   }
-
+  // Roller
+  public void intakeRollerOut (){
+    intakeRollerMotor.set(Constants.IntakeConstants.INTAKE_ROLLER_OUT);
+  }
+  public void intakeRollerIn (){
+    intakeRollerMotor.set(Constants.IntakeConstants.INTAKE_ROLLER_OUT);
+  }
   public void setRoller(double speed){
     intakeRollerMotor.set(speed);
   }
@@ -68,6 +78,11 @@ public class IntakeSubsystem extends SubsystemBase {
     intakeElevatorMotor.setPosition(0);
   }
 
+  public void setIntake(double speed){
+    intakeElevatorMotor.set(speed);
+  }
+
+  // I 
   public void goOut(){
     if((getPosition()<=(IntakeConstants.INTAKING_POSITION-22))){
       setIntake(0.2);

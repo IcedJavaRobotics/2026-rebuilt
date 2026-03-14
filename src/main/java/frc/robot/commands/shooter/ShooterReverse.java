@@ -2,36 +2,37 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.functionchecks;
+package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.ClimberSubsystem;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.subsystems.ShooterSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class ClimberDown extends Command {
-  /** Creates a new ClimberUp. */
-  private ClimberSubsystem climberSubsystem;
-  
-  public ClimberDown(ClimberSubsystem climberSubsystem) {
-    this.climberSubsystem = climberSubsystem;
-    addRequirements(climberSubsystem);
+public class ShooterReverse extends Command {
+  /** Creates a new ShooterReverse. */
+  ShooterSubsystem shooterSubsystem;
+  public ShooterReverse(ShooterSubsystem shooterSubsystem) {
+    this.shooterSubsystem = shooterSubsystem;
+    addRequirements(shooterSubsystem);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    climberSubsystem.moveDown();
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    System.out.println("reversing shooter");
+    shooterSubsystem.reverseShooter();
+  }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    climberSubsystem.stopClimber();
+    shooterSubsystem.stopShooting();
   }
 
   // Returns true when the command should end.

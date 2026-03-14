@@ -40,7 +40,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.*;
 import frc.robot.commands.*;
 import frc.robot.commands.autocommands.*;
-import frc.robot.commands.functionchecks.*;
+import frc.robot.commands.climber.*;
+import frc.robot.commands.intake.*;
+import frc.robot.commands.shooter.*;
+import frc.robot.commands.spindexer.*;
+import frc.robot.commands.swerve.ZeroGyro;
+import frc.robot.commands.swerve.*;
 
 import java.util.Date;
 import java.time.LocalTime;
@@ -151,10 +156,10 @@ public class RobotContainer {
 
                 // Elevator Out
                 new JoystickButton(auxController, XboxController.Button.kY.value)
-                         .whileTrue(new IntakeElevatorTuner(intakeSubsystem, 0.3));
+                         .whileTrue(new IntakeElevatorOut(intakeSubsystem));
                 // Elevator In
                 new JoystickButton(auxController, XboxController.Button.kB.value)
-                         .whileTrue(new IntakeElevatorTuner(intakeSubsystem, -0.3));
+                         .whileTrue(new IntakeElevatorIn(intakeSubsystem));
                 // Shooter Power down
                 new JoystickButton(auxController, XboxController.Button.kA.value)
                         .whileTrue(new TurnDownShooter(shooterSubsystem));
@@ -177,14 +182,14 @@ public class RobotContainer {
                 
                 // Shooter Functions Check (Starts shooter)
                new JoystickButton(driverStation, DriverStationConstants.BOTTOM_LEFT)
-                        .whileTrue(new ShooterFunctionsCheckCommand(shooterSubsystem));
+                        .whileTrue(new StartShooter(shooterSubsystem));
                 // Elevator Out
                 new JoystickButton(driverStation, DriverStationConstants.TOP_LEFT)
-                        .whileTrue(new IntakeElevatorTuner(intakeSubsystem, 0.3));
+                        .whileTrue(new IntakeElevatorOut(intakeSubsystem));
                 // Elevator In
                 new JoystickButton(driverStation, DriverStationConstants.MIDDLE_LEFT)
-                        .whileTrue(new IntakeElevatorTuner(intakeSubsystem, -0.3));
-                // Full intake command (Holding makes intake elevator and rollers start, letting go resets)
+                        .whileTrue(new IntakeElevatorIn(intakeSubsystem));
+                // Full intake command/Hold Intake (Holding makes intake elevator and rollers start, letting go resets)
                 new JoystickButton(driverStation, DriverStationConstants.MIDDLE_RIGHT)
                         .whileTrue(new IntakeHold(intakeSubsystem));
                 // Climber Up
@@ -200,8 +205,8 @@ public class RobotContainer {
                 new JoystickButton(driverStation, DriverStationConstants.TOP_RIGHT)
                         .whileTrue(new ShooterReverse(shooterSubsystem));
                 // Starts shooter
-                shootingTrigger.whileTrue(new ShooterFunctionsCheckCommand(shooterSubsystem));
-                // Full intake command (Holding makes intake elevator and rollers start, letting go resets)
+                shootingTrigger.whileTrue(new StartShooter(shooterSubsystem));
+                // Full intake command/Hold Intake (Holding makes intake elevator and rollers start, letting go resets)
                 intakeTrigger.whileTrue(new IntakeHold(intakeSubsystem));
 
                 
@@ -215,6 +220,7 @@ public class RobotContainer {
                 
                 // Switches
                 SmartDashboard.putBoolean("auto intake inward", true);
+                SmartDashboard.putBoolean("leds on", false);
         }
 
         /**

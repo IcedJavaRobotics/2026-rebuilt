@@ -59,18 +59,18 @@ public final class Constants {
     public static final String CANBUS = "rio";
     public static final String CANIVORE = "iceberg-canivore";
 
-    public static final int KRAKEN_RPS = 100;
+    public static final int KRAKEN_RPS = 520;
   }
 
   public static class ShooterConstants {
-    public static final double GEAR_RATIO = 1;
-    // Speed for functions check without a ball
-    public static final double TESTING_SPEED = 0.75;
 
+    public static final double GEAR_RATIO = 1;
+    public static final double DEFAULT_SHOOTER_SPEED = 0.75;
+    public static final double REVERSE_SHOOTER_SPEED = -0.6;
+    public static final double DESIRED_SPEED_INTERVAL = 0.01;
     // Manual Mode Shooting distances
-    public static final double CLOSE_LAUNCH_SPEED = 0.4;
-    public static final double MEDIUM_LAUNCH_SPEED = 0.6;
-    public static final double FAR_LAUNCH_SPEED = 0.7;
+
+
 
   }
 
@@ -85,6 +85,9 @@ public final class Constants {
     public static final double AUTOMATIC_INTAKE_SPEED = 0.3;
     public static final double MANUAL_INTAKE_SPEED = 0.5;
     public static final double MANUAL_SHUFFLE_SPEED = 0.1; // hold this when going over the bump to ensure balls dont fall out.
+    public static final double INTAKE_ELEVATOR_IN = -0.3; // IN IS NEGATIVE FOR SHOOTER
+    public static final double INTAKE_ELEVATOR_OUT = 0.3;
+    public static final double INTAKE_ROLLER_OUT = -0.05; // OUT IS NEGATIVE FOR ROLLER
 
     public static final double INTAKING_POSITION = 31; //34
   }

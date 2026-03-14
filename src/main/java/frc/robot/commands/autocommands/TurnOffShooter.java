@@ -22,6 +22,6 @@ public class TurnOffShooter extends InstantCommand {
   @Override
   public void initialize() {
     shooterSubsystem.setDesiredSpeed(0.65);
-    shooterSubsystem.stop();
+    shooterSubsystem.stopShooting();
   }
 }

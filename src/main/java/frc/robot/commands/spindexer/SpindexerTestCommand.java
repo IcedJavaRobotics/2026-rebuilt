@@ -2,39 +2,39 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.spindexer;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.SpindexerSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class RollerInCommand extends Command {
-   IntakeSubsystem intakeSubsystem;
+public class SpindexerTestCommand extends Command {
 
-  /** Creates a new RollerInCommand. */
-  public RollerInCommand(IntakeSubsystem i_Subsystem) {
-    addRequirements(i_Subsystem);
-    this.intakeSubsystem = i_Subsystem;  // Use addRequirements() here to declare subsystem dependencies.
+  SpindexerSubsystem spindexerSubsystem;
+  /** Creates a new SpindexerCommand. */
+  public SpindexerTestCommand(SpindexerSubsystem spindexerSubsystem) {
+    this.spindexerSubsystem = spindexerSubsystem;
+
+    addRequirements(spindexerSubsystem);
+    // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    spindexerSubsystem.startTest();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-
-    intakeSubsystem.rollerIn();
-
+    spindexerSubsystem.runSpindexer();
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-
-    intakeSubsystem.rollerStop();
-
+    spindexerSubsystem.stop();
   }
 
   // Returns true when the command should end.
