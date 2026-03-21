@@ -22,4 +22,11 @@ public class TurnDownShooter extends InstantCommand {
   public void initialize() {
     shooterSubsystem.decreaseDesiredSpeed();
   }
+
+    // Allows us to run while the robot is not enabled
+  @Override
+  public boolean runsWhenDisabled(){
+    return true;
+  }
+  
 }

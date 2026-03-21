@@ -55,7 +55,7 @@ public final class Constants {
     public static final int SPINDEXER_MOTOR_ID = 56;
 
     public static final String CANBUS = "rio";
-    public static final String CANIVORE = "iceberg-canivore";
+    public static final String CANIVORE = "CANivore";
 
     public static final int KRAKEN_RPS = 520; // max rps
   }
