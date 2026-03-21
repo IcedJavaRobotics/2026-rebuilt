@@ -60,7 +60,7 @@ import java.time.format.DateTimeFormatter;
 public class RobotContainer {
 
         // initialize subsystems
-        private final SwerveSubsystem driveSubsystem = new SwerveSubsystem();
+        //private final SwerveSubsystem driveSubsystem = new SwerveSubsystem();
         private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
         private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
         private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem();
@@ -98,7 +98,7 @@ public class RobotContainer {
                 configureBindings();
 
                 // Setup default commands
-                driveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity); 
+                //driveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity); 
                 intakeSubsystem.setDefaultCommand(resetIntake);     //.onlyIf(switchEnabled));
      
                 //autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be
@@ -110,18 +110,18 @@ public class RobotContainer {
         }
 
 
-        SwerveInputStream driveAngularVelocity = SwerveInputStream.of(driveSubsystem.getSwerveDrive(),
-                        () -> driverController.getLeftY() * getMultiplier(),
-                        () -> driverController.getLeftX() * getMultiplier())
-                        .withControllerRotationAxis(() -> getRightX())
-                        .deadband(getDeadzone())
-                        .scaleTranslation(1)// Can be changed to alter speed
-                        .allianceRelativeControl(true);
+        // SwerveInputStream driveAngularVelocity = SwerveInputStream.of(driveSubsystem.getSwerveDrive(),
+        //                 () -> driverController.getLeftY() * getMultiplier(),
+        //                 () -> driverController.getLeftX() * getMultiplier())
+        //                 .withControllerRotationAxis(() -> getRightX())
+        //                 .deadband(getDeadzone())
+        //                 .scaleTranslation(1)// Can be changed to alter speed
+        //                 .allianceRelativeControl(true);
 
-        SwerveInputStream driveRobotOrientedVelocity = driveAngularVelocity.copy().robotRelative(true).allianceRelativeControl(false);
+        //SwerveInputStream driveRobotOrientedVelocity = driveAngularVelocity.copy().robotRelative(true).allianceRelativeControl(false);
 
-        Command driveFieldOrientedAngularVelocity = driveSubsystem.driveFieldOriented(driveAngularVelocity);
-        Command driveRobotOriented = driveSubsystem.driveFieldOriented(driveRobotOrientedVelocity);
+        // Command driveFieldOrientedAngularVelocity = driveSubsystem.driveFieldOriented(driveAngularVelocity);
+        // Command driveRobotOriented = driveSubsystem.driveFieldOriented(driveRobotOrientedVelocity);
         Command resetIntake = intakeSubsystem.resetElevator(() -> getSwitch());
 
         /**
@@ -142,12 +142,12 @@ public class RobotContainer {
 
                 // ----------------------- MAIN DRIVER CONTROLS ----------------------------------------------------------------------
 
-                // Left bumper causes straightforward driving
-                new Trigger(driverController::getRightBumperButton).whileTrue(driveRobotOriented);
+                // // Left bumper causes straightforward driving
+                // new Trigger(driverController::getRightBumperButton).whileTrue(driveRobotOriented);
                 
-                // B button causes the driver to zero their controller
-                new JoystickButton(driverController, XboxController.Button.kB.value)
-                        .whileTrue(new ZeroGyro(driveSubsystem));  //zero gyro on B
+                // // B button causes the driver to zero their controller
+                // new JoystickButton(driverController, XboxController.Button.kB.value)
+                //         .whileTrue(new ZeroGyro(driveSubsystem));  //zero gyro on B
                 
                 new JoystickButton(driverController, XboxController.Button.kA.value)
                         .whileTrue(new SpindexerCommand(spindexerSubsystem));
@@ -155,7 +155,7 @@ public class RobotContainer {
                 new JoystickButton(driverController, XboxController.Button.kB.value)
                         .whileTrue(new StartShooter(shooterSubsystem));
 
-                lockTrigger.whileTrue(new LockUpWheels(driveSubsystem));
+                // lockTrigger.whileTrue(new LockUpWheels(driveSubsystem));
 
                 // ----------------------- AUX DRIVER CONTROLS -----------------------------------------------------------------------
 
@@ -196,7 +196,7 @@ public class RobotContainer {
                         .whileTrue(new ZeroIntake(intakeSubsystem));
                 // Shooter Reverse
                 new JoystickButton(driverStation, DriverStationConstants.TOP_RIGHT)
-                        .whileTrue(new ShooterReverse(shooterSubsystem));
+                        .whileTrue(new IntakeRollerTest(intakeSubsystem));
                 // Starts shooter
                 shootingTrigger.whileTrue(new StartShooter(shooterSubsystem));
                 // Full intake command/Hold Intake (Holding makes intake elevator and rollers start, letting go resets)
