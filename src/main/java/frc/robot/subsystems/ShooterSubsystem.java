@@ -21,11 +21,15 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.LauncherPhysics;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.Constants.ShooterConstants;
 
 public class ShooterSubsystem extends SubsystemBase {
+
+
+  LauncherPhysics launcherCalculator = new LauncherPhysics();
 
   TalonFX ShooterMotorLeader;
   TalonFX ShooterMotorFollower;
@@ -43,7 +47,7 @@ public class ShooterSubsystem extends SubsystemBase {
     // Setup motors
     this.ShooterMotorLeader = new TalonFX(HardwareConstants.SHOOTER_LEFT_MOTOR_ID, HardwareConstants.CANBUS);
     this.ShooterMotorFollower = new TalonFX(HardwareConstants.SHOOTER_RIGHT_MOTOR_ID, HardwareConstants.CANBUS);
-    System.out.println("STATUS OF MOTOR FOLLOWING: " + ShooterMotorFollower.setControl(new Follower(HardwareConstants.SHOOTER_LEFT_MOTOR_ID, MotorAlignmentValue.Aligned))); 
+    System.out.println("STATUS OF MOTOR FOLLOWING: " + ShooterMotorFollower.setControl(new Follower(HardwareConstants.SHOOTER_LEFT_MOTOR_ID, MotorAlignmentValue.Opposed))); 
     
     // Inialize smart dashboard
     updateDesiredSpeed();
@@ -55,7 +59,13 @@ public class ShooterSubsystem extends SubsystemBase {
    * @deprecated Right now this method should not be used, as it is non functional
    */
   public void spinUp(double speed){
-    ShooterMotorLeader.set(spinUpController.calculate(ShooterMotorLeader.getVelocity().getValueAsDouble() / HardwareConstants.KRAKEN_RPS, speed));
+    //ShooterMotorLeader.set(spinUpController.calculate(ShooterMotorLeader.getVelocity().getValueAsDouble() / HardwareConstants.KRAKEN_RPS, speed));
+    ShooterMotorLeader.set(speed);
+  }
+
+
+  public void shootToDistance(double distance){
+    spinUp(launcherCalculator.getRPM(distance));
   }
 
   /**

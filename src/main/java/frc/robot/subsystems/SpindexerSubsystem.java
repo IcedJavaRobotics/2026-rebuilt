@@ -16,6 +16,8 @@ public class SpindexerSubsystem extends SubsystemBase {
 
   TalonFX spindexerMotor;
 
+  
+
   // things I copied------------
   private double targetVelocity;
   private double gain;
@@ -26,7 +28,7 @@ public class SpindexerSubsystem extends SubsystemBase {
   /** Creates a new SpindexerSubsystem. */
   public SpindexerSubsystem() {
     spindexerMotor = new TalonFX(HardwareConstants.SPINDEXER_MOTOR_ID);
-
+    SmartDashboard.putNumber("desired indexer speed", SpindexerConstants.MANUAL_NORMAL_SPEED);
 
   }
 
@@ -35,7 +37,7 @@ public class SpindexerSubsystem extends SubsystemBase {
   }
 
   public void start(){
-    set(SpindexerConstants.MANUAL_NORMAL_SPEED);
+    set(SmartDashboard.getNumber("desired indexer speed", 0));
   }
   public void startTest(){
     set(SmartDashboard.getNumber("spindexer-speed", 0));
@@ -48,7 +50,7 @@ public class SpindexerSubsystem extends SubsystemBase {
   public double getSpeed(){
     return spindexerMotor.get();
   }
-
+  
     public void runSpindexer() {
       // TODO - add take-back-half method to accelerate faster
   }

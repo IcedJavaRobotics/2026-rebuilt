@@ -38,13 +38,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 // import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.*;
-import frc.robot.commands.*;
 import frc.robot.commands.autocommands.*;
-import frc.robot.commands.climber.*;
 import frc.robot.commands.intake.*;
 import frc.robot.commands.shooter.*;
 import frc.robot.commands.spindexer.*;
-import frc.robot.commands.swerve.ZeroGyro;
 import frc.robot.commands.swerve.*;
 
 import java.util.Date;
@@ -69,7 +66,6 @@ public class RobotContainer {
         private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem();
         private final VisionSubsystem visionSubsystem = new VisionSubsystem();
         private final LimelightSubsystem limelightSubsystem = new LimelightSubsystem();
-        private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
 
         // Initialize Controllers
         private final XboxController driverController = new XboxController(DriverConstants.MAIN_DRIVER_PORT);
@@ -81,6 +77,8 @@ public class RobotContainer {
         Trigger shootcontrolSwitch = new Trigger( () -> getSwitch());
         Trigger shootingTrigger = new Trigger( () -> getRightAuxTriggerValue());
         Trigger intakeTrigger = new Trigger( () -> getLeftAuxTriggerValue());
+
+        Trigger lockTrigger = new Trigger( () -> getRightDriverTriggerValue());
 
 
         BooleanSupplier switchEnabled = ( () -> getSwitch());
@@ -151,6 +149,13 @@ public class RobotContainer {
                 new JoystickButton(driverController, XboxController.Button.kB.value)
                         .whileTrue(new ZeroGyro(driveSubsystem));  //zero gyro on B
                 
+                new JoystickButton(driverController, XboxController.Button.kA.value)
+                        .whileTrue(new SpindexerCommand(spindexerSubsystem));
+                
+                new JoystickButton(driverController, XboxController.Button.kB.value)
+                        .whileTrue(new StartShooter(shooterSubsystem));
+
+                lockTrigger.whileTrue(new LockUpWheels(driveSubsystem));
 
                 // ----------------------- AUX DRIVER CONTROLS -----------------------------------------------------------------------
 
@@ -169,14 +174,8 @@ public class RobotContainer {
                 // Shooter Reverse
                 new JoystickButton(auxController, XboxController.Button.kRightBumper.value)
                         .whileTrue(new ShooterReverse(shooterSubsystem));
-                // Climber Up
-                new JoystickButton(auxController, XboxController.Button.kStart.value)
-                        .whileTrue(new ClimberUp(climberSubsystem));
-                // Climber Down
-                new JoystickButton(auxController, XboxController.Button.kBack.value)
-                        .whileTrue(new ClimberDown(climberSubsystem));
 
-                
+                //print "shut up you chud" - Antony
 
                 // ----------------------- BUTTON BOARD CONTROLS ----------------------------------------------------------------------
                 
@@ -192,12 +191,6 @@ public class RobotContainer {
                 // Full intake command/Hold Intake (Holding makes intake elevator and rollers start, letting go resets)
                 new JoystickButton(driverStation, DriverStationConstants.MIDDLE_RIGHT)
                         .whileTrue(new IntakeHold(intakeSubsystem));
-                // Climber Up
-                new JoystickButton(driverStation, DriverStationConstants.TOP_MIDDLE)
-                        .whileTrue(new ClimberUp(climberSubsystem));
-                // Climber Down
-                new JoystickButton(driverStation, DriverStationConstants.MIDDLE_MIDDLE)
-                        .whileTrue(new ClimberDown(climberSubsystem));
                 // Zeroes the intake
                 new JoystickButton(driverStation, DriverStationConstants.BOTTOM_MIDDLE)
                         .whileTrue(new ZeroIntake(intakeSubsystem));

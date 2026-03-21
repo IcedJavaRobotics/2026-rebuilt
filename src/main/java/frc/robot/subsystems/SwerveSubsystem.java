@@ -36,7 +36,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.LinearVelocityUnit;
+import edu.wpi.first.units.measure.LinearVelocity;
 
 public class SwerveSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
@@ -49,7 +52,7 @@ public class SwerveSubsystem extends SubsystemBase {
       swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.DriverConstants.MAX_SPEED,
           new Pose2d(new Translation2d(Units.feetToMeters(3),
               Units.feetToMeters(4)),
-              Rotation2d.fromDegrees(180))); //TODO: TEST CHANGING THESE VALUES
+              Rotation2d.fromDegrees(0))); //TODO: TEST CHANGING THESE VALUES
               
       // Alternative method if you don't want to supply the conversion factor via JSON
       // files.
@@ -206,4 +209,18 @@ public ChassisSpeeds getRobotRelativeSpeeds(){
   public void functionsCheck(ShuffleboardTab functionsCheckTab) {
     
   }
+
+
+  public void lockUpWheels(){
+    SwerveModuleState[] moduleStates = {
+      new SwerveModuleState(0.0, new Rotation2d(45)),
+      new SwerveModuleState(0.0, new Rotation2d(45)),
+      new SwerveModuleState(0.0, new Rotation2d(45)),
+      new SwerveModuleState(0.0, new Rotation2d(45))
+    };
+
+    swerveDrive.setModuleStates(moduleStates, false);
+  }
+
+
 }

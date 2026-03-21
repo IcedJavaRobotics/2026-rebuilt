@@ -52,8 +52,6 @@ public final class Constants {
     public static final int SHOOTER_LEFT_MOTOR_ID = 61;
     public static final int SHOOTER_RIGHT_MOTOR_ID = 62;
 
-    public static final int CLIMBER_MOTOR_ID = 55;
-
     public static final int SPINDEXER_MOTOR_ID = 56;
 
     public static final String CANBUS = "rio";
@@ -65,8 +63,8 @@ public final class Constants {
   public static class ShooterConstants {
 
     public static final double GEAR_RATIO = 1;
-    public static final double DEFAULT_SHOOTER_SPEED = 0.75;
-    public static final double REVERSE_SHOOTER_SPEED = -0.6;
+    public static final double DEFAULT_SHOOTER_SPEED = -0.65; //made negative after cabarrus change
+    public static final double REVERSE_SHOOTER_SPEED = 0.6;
     public static final double DESIRED_SPEED_INTERVAL = 0.01;
     public static final double SHOOTING_DEADZONE = 0.05;
     // Manual Mode Shooting distances
@@ -77,8 +75,8 @@ public final class Constants {
 
   public static class SpindexerConstants {
     // Speeds for spindexer
-    public static final double TESTING_SPEED = 0.2;
-    public static final double MANUAL_NORMAL_SPEED = 0.4;
+    public static final double TESTING_SPEED = -0.2;
+    public static final double MANUAL_NORMAL_SPEED = -0.75;
   }
 
   public static class IntakeConstants {
