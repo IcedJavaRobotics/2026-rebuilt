@@ -33,15 +33,18 @@ public class FullShootCommand extends Command {
     if(limelightSubsystem.getDistance() == 6894){
       shooterSubsystem.startShooting(); //shoot at default speed if no apriltag detected
       //TODO make it remember the distance so that way if it gets interupted the speed doesnt change
+    } else{
+      shooterSubsystem.shootToDistance(limelightSubsystem.getDistance());
     }
-    shooterSubsystem.shootToDistance(limelightSubsystem.getDistance());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     if(shooterSubsystem.isAtFullSpeed()){
-      spindexerSubsystem.runSpindexer();
+      spindexerSubsystem.start();
+      //intakeSubsystem.agitate();
+      
     }
   }
 

@@ -62,7 +62,11 @@ public class IntakeSubsystem extends SubsystemBase {
     intakeRollerMotor.set(Constants.IntakeConstants.INTAKE_ROLLER_OUT);
   }
   public void intakeRollerIn (){
-    intakeRollerMotor.set(Constants.IntakeConstants.INTAKE_ROLLER_OUT);
+    intakeRollerMotor.set(-Constants.IntakeConstants.INTAKE_ROLLER_OUT);
+  }
+
+  public void agitate(){
+    intakeRollerMotor.set(-0.2);
   }
   public void setRoller(double speed){
     intakeRollerMotor.set(speed);
@@ -150,6 +154,9 @@ public class IntakeSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("elevatorEncoder", intakeElevatorMotor.getPosition().getValueAsDouble());
+
+    SmartDashboard.putNumber("intake torque current", intakeElevatorMotor.getTorqueCurrent().getValueAsDouble());
+    SmartDashboard.putNumber("intake elevator speed", intakeElevatorMotor.getVelocity().getValueAsDouble());
     
   }
 

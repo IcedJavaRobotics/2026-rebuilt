@@ -94,22 +94,24 @@ public class LimelightSubsystem extends SubsystemBase {
      * @return horizontal floor distance from robot to apriltag
      */
     public double getDistance() {
+        return 6894;
+        // if(!tagDetected()){
+        //     return 6894;
+        // }
+        // double targetOffsetAngle_Vertical = getTy();
+        // double goalHeightInches = LimelightConstants.APRILTAG_HEIGHT;
+        // double angleToGoalRadians = (LimelightConstants.LIMELIGHT_ANGLE + targetOffsetAngle_Vertical) * (3.14159 / 180);
 
-        if(!tagDetected()){
-            return 6894;
-        }
-        double targetOffsetAngle_Vertical = getTy();
-        double goalHeightInches = LimelightConstants.APRILTAG_HEIGHT;
-        double angleToGoalRadians = (LimelightConstants.LIMELIGHT_ANGLE + targetOffsetAngle_Vertical) * (3.14159 / 180);
-
-        // calculate distance
-        if (getTy() >= 0) {
-            return ((goalHeightInches - LimelightConstants.LIMELIGHT_HEIGHT) / Math.tan(angleToGoalRadians) + LimelightConstants.HUB_RADIUS);
-        } else {
-            return ((LimelightConstants.LIMELIGHT_HEIGHT) / Math.tan(angleToGoalRadians) + LimelightConstants.HUB_RADIUS);
-        }
+        // // calculate distance
+        // if (getTy() >= 0) {
+        //     return ((goalHeightInches - LimelightConstants.LIMELIGHT_HEIGHT) / Math.tan(angleToGoalRadians) + LimelightConstants.HUB_RADIUS);
+        // } else {
+        //     return ((LimelightConstants.LIMELIGHT_HEIGHT) / Math.tan(angleToGoalRadians) + LimelightConstants.HUB_RADIUS);
+        // }
 
     }
+
+
 
     @Override
     public void periodic() {
@@ -124,4 +126,6 @@ public class LimelightSubsystem extends SubsystemBase {
 
 
     }
+
+
 }

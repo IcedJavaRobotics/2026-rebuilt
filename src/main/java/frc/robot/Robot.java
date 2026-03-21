@@ -49,8 +49,7 @@ public class Robot extends TimedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-    System.out.println("why did you turn me off? dont you love me anymore?");
-    System.out.println("Are there other robots in your life?");
+    System.out.println("why did you turn me off? dont you love me anymore? Are there other robots in your life?");
   }
 
   @Override

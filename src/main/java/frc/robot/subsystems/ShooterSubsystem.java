@@ -64,7 +64,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
 
   public void shootToDistance(double distance){
-    spinUp(launcherCalculator.getRPM(distance));
+    spinUp(-launcherCalculator.getRPM(distance));
   }
 
   /**
@@ -115,10 +115,14 @@ public class ShooterSubsystem extends SubsystemBase {
   }
   
   public boolean isAtFullSpeed(){
-    if(this.getVelocity() >= launcherCalculator.getVelocity(this.desiredSpeed)){
+    if(this.getVelocity() <= -55){
       return true;
     }
     return false;
+    // if(this.getVelocity() >= launcherCalculator.getVelocity(this.desiredSpeed)){
+    //   return true;
+    // }
+    // return false;
   }
 
 

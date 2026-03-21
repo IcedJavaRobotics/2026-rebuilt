@@ -92,7 +92,7 @@ public final class Constants {
     public static final double INTAKE_ELEVATOR_OUT = 0.3;
     public static final double INTAKE_ROLLER_OUT = -0.05; // OUT IS NEGATIVE FOR ROLLER
 
-    public static final double INTAKING_POSITION = 33; //34
+    public static final double INTAKING_POSITION = 32; //34
     public static final double MARGIN = 0.5;
   }
 

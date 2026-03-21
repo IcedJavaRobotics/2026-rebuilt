@@ -76,7 +76,7 @@ public class RobotContainer {
         JoystickButton manualSwitch = new JoystickButton(driverStation, 7);
         Trigger shootcontrolSwitch = new Trigger( () -> getSwitch());
         Trigger shootingTrigger = new Trigger( () -> getRightAuxTriggerValue());
-        Trigger intakeTrigger = new Trigger( () -> getLeftAuxTriggerValue());
+        Trigger intakeTrigger = new Trigger( () -> getLeftDriverTriggerValue());
 
         Trigger lockTrigger = new Trigger( () -> getRightDriverTriggerValue());
 
@@ -158,7 +158,7 @@ public class RobotContainer {
                 new JoystickButton(driverController, XboxController.Button.kB.value)
                         .whileTrue(new StartShooter(shooterSubsystem));
 
-                // lockTrigger.whileTrue(new LockUpWheels(driveSubsystem));
+                lockTrigger.whileTrue(new LockUpWheels(driveSubsystem));
 
                 // ----------------------- AUX DRIVER CONTROLS -----------------------------------------------------------------------
 

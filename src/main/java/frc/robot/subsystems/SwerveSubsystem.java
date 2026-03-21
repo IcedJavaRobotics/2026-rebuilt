@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.LimelightHelpers;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +32,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import swervelib.parser.SwerveParser;
 import swervelib.SwerveDrive;
 import swervelib.SwerveModule;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -47,7 +49,10 @@ public class SwerveSubsystem extends SubsystemBase {
   File directory = new File(Filesystem.getDeployDirectory(), "swerve");
   SwerveDrive swerveDrive;
 
+
   public SwerveSubsystem() {
+      
+    LimelightHelpers.setCameraPose_RobotSpace("limelight-sauron", -0.2, 0, 0.52, 180, -22, 0);
     try {
       swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.DriverConstants.MAX_SPEED,
           new Pose2d(new Translation2d(Units.feetToMeters(3),
@@ -104,7 +109,7 @@ public class SwerveSubsystem extends SubsystemBase {
                         //       );
 
                       
-
+                              swerveDrive.setAutoCenteringModules(false);
                               this.getSwerveDrive().setGyro(new Rotation3d(0, 0, 0));
   }
 
@@ -147,11 +152,20 @@ public ChassisSpeeds getRobotRelativeSpeeds(){
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    updateVisionOdometry();
     for (SwerveModule swerveModule : swerveDrive.getModules()) {
       SmartDashboard.putNumber(swerveModule.toString(), swerveModule.getAbsolutePosition());
     }
     SmartDashboard.putNumber("pose", this.getPose().getRotation().getDegrees());
     SmartDashboard.putNumber("yaw", swerveDrive.getYaw().getDegrees());
+  }
+
+  public void updateVisionOdometry(){
+    LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight-sauron");
+    if(limelightMeasurement.tagCount >= 2){
+      swerveDrive.addVisionMeasurement(limelightMeasurement.pose, limelightMeasurement.timestampSeconds, VecBuilder.fill(.7,.7,99999));
+      System.out.println("POSE UPDATED");
+    }
   }
 
   @Override
@@ -212,14 +226,10 @@ public ChassisSpeeds getRobotRelativeSpeeds(){
 
 
   public void lockUpWheels(){
-    SwerveModuleState[] moduleStates = {
-      new SwerveModuleState(0.0, new Rotation2d(45)),
-      new SwerveModuleState(0.0, new Rotation2d(45)),
-      new SwerveModuleState(0.0, new Rotation2d(45)),
-      new SwerveModuleState(0.0, new Rotation2d(45))
-    };
 
-    swerveDrive.setModuleStates(moduleStates, false);
+
+    swerveDrive.lockPose();
+    
   }
 
 
