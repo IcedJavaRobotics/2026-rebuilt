@@ -27,6 +27,7 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     System.out.println("HAILSTORM LOADING.......");
     m_robotContainer = new RobotContainer();
+    System.out.println("Loading complete");
   }
 
   /**
@@ -49,6 +50,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     System.out.println("why did you turn me off? dont you love me anymore?");
+    System.out.println("Are there other robots in your life?");
   }
 
   @Override

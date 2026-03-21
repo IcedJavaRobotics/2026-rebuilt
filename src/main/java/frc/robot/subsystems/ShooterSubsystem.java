@@ -109,7 +109,17 @@ public class ShooterSubsystem extends SubsystemBase {
     }
     
   }
+
+  public double getVelocity(){
+    return ShooterMotorLeader.getVelocity().getValueAsDouble();
+  }
   
+  public boolean isAtFullSpeed(){
+    if(this.getVelocity() >= launcherCalculator.getVelocity(this.desiredSpeed)){
+      return true;
+    }
+    return false;
+  }
 
 
   // These methods can be used to change the desired speed of the shooter through buttons, used primarily for tuning
@@ -146,6 +156,9 @@ public class ShooterSubsystem extends SubsystemBase {
       SmartDashboard.putNumber("Shooter foll speed", ShooterMotorFollower.get());
       SmartDashboard.putNumber("shooter lead temp", ShooterMotorLeader.getDeviceTemp().getValueAsDouble());
       SmartDashboard.putNumber("shooter foll temp", ShooterMotorFollower.getDeviceTemp().getValueAsDouble());
+
+      SmartDashboard.putNumber("Shooter Velocity", this.getVelocity());
+      SmartDashboard.putNumber("estimated shooter velocity", launcherCalculator.getVelocity(this.desiredSpeed));
   }
 
   @Override

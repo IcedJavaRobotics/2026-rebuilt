@@ -105,16 +105,13 @@ public final class Constants {
 
     public static final class LimelightConstants {
     /** upward angle of limelight camera [degrees] */
-    public static final double LIMELIGHT_ANGLE = 3.0;
+    public static final double LIMELIGHT_ANGLE = 22.0;
     /** distance from limelight lens from floor [inches] */
     public static final double LIMELIGHT_HEIGHT = 18.5;
-    /** distance from apriltag to floor(bottom of tag) [inches] */
-    public static final double APRILTAG_HEIGHT = 14.25;
-    /**
-     * distance from apriltag to floor but its the double substation(bottom of tag)
-     * [inches]
-     */
-    public static final double APRILTAG_DOUBLE_SUBSTATION_HEIGHT = 23.375;
+    /** distance from hub apriltag to floor(bottom of tag) [inches] */
+    public static final double APRILTAG_HEIGHT = 44.25;
+    /** distance from the edge of the hub where the apriltag is located to the center of the hub [inches] */
+    public static final double HUB_RADIUS = 23.5;
   }
 
   public static class PhysicsConstants {
@@ -125,6 +122,15 @@ public final class Constants {
 
   public static class Globals {
     //try not to use this but use robot container instead
+  }
+
+
+  public static class Credits {
+    public static final String DRIVER = "Luke";
+    public static final String AUX_DRIVER = "Jackson";
+    public static final String DRIVE_COACH = "Savannah";
+
+    public static final String[] Programmers = {"Luke", "Alec"};
   }
 
 

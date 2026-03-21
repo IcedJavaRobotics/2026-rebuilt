@@ -17,10 +17,6 @@ import edu.wpi.first.cscore.HttpCamera;
 
 public class LimelightSubsystem extends SubsystemBase {
 
-    // private Spark blinkin = new Spark(0); //Creates a blinkin as if it were a
-    // spark.
-    // Creates a new LimelightSubsystem.
-
     private double lockedApriltag = -1;
     private double lastSeenApriltag = -1;
 
@@ -99,46 +95,20 @@ public class LimelightSubsystem extends SubsystemBase {
      */
     public double getDistance() {
 
+        if(!tagDetected()){
+            return 6894;
+        }
         double targetOffsetAngle_Vertical = getTy();
         double goalHeightInches = LimelightConstants.APRILTAG_HEIGHT;
         double angleToGoalRadians = (LimelightConstants.LIMELIGHT_ANGLE + targetOffsetAngle_Vertical) * (3.14159 / 180);
 
-        if (getTid() == 4 || getTid() == 5) {
-            goalHeightInches = LimelightConstants.APRILTAG_DOUBLE_SUBSTATION_HEIGHT;
-        } // tid 4 and 5 are the double substations
-
         // calculate distance
         if (getTy() >= 0) {
-            return (goalHeightInches - LimelightConstants.LIMELIGHT_HEIGHT) / Math.tan(angleToGoalRadians);
+            return ((goalHeightInches - LimelightConstants.LIMELIGHT_HEIGHT) / Math.tan(angleToGoalRadians) + LimelightConstants.HUB_RADIUS);
         } else {
-            return (LimelightConstants.LIMELIGHT_HEIGHT) / Math.tan(angleToGoalRadians);
+            return ((LimelightConstants.LIMELIGHT_HEIGHT) / Math.tan(angleToGoalRadians) + LimelightConstants.HUB_RADIUS);
         }
 
-    }
-
-    /**
-     * Based on the ID, returns the heading to turn to the reef to place
-     * @return the robot goal heading
-     */
-    public double getReefHeading(){
-
-        if(lockedApriltag == 21 || lockedApriltag == 7){
-            return 0;
-        } else if(lockedApriltag == 19 || lockedApriltag == 8){
-            return 60;
-        } else if(lockedApriltag == 20 || lockedApriltag == 9){
-            return 120;
-        } else if(lockedApriltag == 18 || lockedApriltag == 10){
-            return 179.99;
-        } else if(lockedApriltag == 22 || lockedApriltag == 11){
-            return -120;
-        } else if(lockedApriltag == 17 || lockedApriltag == 6){
-            return -60;
-        }
-        // if(id==11){
-        //     return 90;
-        // }
-         return 6894;
     }
 
     @Override
@@ -150,7 +120,7 @@ public class LimelightSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("apriltag", getTid());
         SmartDashboard.putNumber("Locked apriltag", lockedApriltag);
         SmartDashboard.putNumber("last apriltag", lastSeenApriltag);
-        SmartDashboard.putNumber("desired heading", getReefHeading());
+        SmartDashboard.putNumber("distance", getDistance());
 
 
     }

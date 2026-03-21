@@ -99,6 +99,9 @@ public class RobotContainer {
 
                 // Setup default commands
                 driveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity); 
+                System.out.println("Awesome name.........100%");
+                System.out.println("Neuralink.........100%");
+                System.out.println("Spaghetti code.........100%");
                 //intakeSubsystem.setDefaultCommand(resetIntake);     //.onlyIf(switchEnabled));
      
                 //autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be
@@ -175,6 +178,20 @@ public class RobotContainer {
                 new JoystickButton(auxController, XboxController.Button.kRightBumper.value)
                         .whileTrue(new ShooterReverse(shooterSubsystem));
 
+                // Just shoot
+                new JoystickButton(auxController, XboxController.Button.kStart.value)
+                        .whileTrue(new StartShooter(shooterSubsystem));
+                // Just index
+                new JoystickButton(auxController, XboxController.Button.kBack.value)
+                        .whileTrue(new SpindexerCommand(spindexerSubsystem));
+
+                // Starts shooter
+                shootingTrigger.whileTrue(new FullShootCommand(shooterSubsystem, spindexerSubsystem, intakeSubsystem, limelightSubsystem));
+                // Full intake command/Hold Intake (Holding makes intake elevator and rollers start, letting go resets)
+                intakeTrigger.whileTrue(new IntakeHold(intakeSubsystem));
+
+
+
                 //print "shut up you chud" - Antony
 
                 // ----------------------- BUTTON BOARD CONTROLS ----------------------------------------------------------------------
@@ -197,10 +214,7 @@ public class RobotContainer {
                 // Shooter Reverse
                 new JoystickButton(driverStation, DriverStationConstants.TOP_RIGHT)
                         .whileTrue(new IntakeRollerTest(intakeSubsystem));
-                // Starts shooter
-                shootingTrigger.whileTrue(new StartShooter(shooterSubsystem));
-                // Full intake command/Hold Intake (Holding makes intake elevator and rollers start, letting go resets)
-                intakeTrigger.whileTrue(new IntakeHold(intakeSubsystem));
+
 
                 
         }

@@ -10,14 +10,28 @@ public class LauncherPhysics {
      */
     private InterpolatingDoubleTreeMap shooterTable = new InterpolatingDoubleTreeMap();
 
+    private InterpolatingDoubleTreeMap shooterConversionTable = new InterpolatingDoubleTreeMap();
+
     public LauncherPhysics(){
+        initializeShooterTable();
+        initializeShooterConversionTable();
+    }
+
+    private void initializeShooterTable(){
         shooterTable.put(0.1, 0.1); // left number is the distance, right number is the rpm
         shooterTable.put(2.0, 0.55); //just add more numbers to the table as you test
     }
 
+    private void initializeShooterConversionTable(){
+        shooterConversionTable.put(0.0, 0.0);
+    }
 
     public double getRPM(double distance){
         return shooterTable.get(distance);
+    }
+
+    public double getVelocity(double percentOutput){
+        return shooterConversionTable.get(percentOutput);
     }
 
 }
