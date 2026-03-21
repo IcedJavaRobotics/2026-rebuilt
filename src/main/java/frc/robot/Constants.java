@@ -58,6 +58,10 @@ public final class Constants {
     public static final String CANIVORE = "CANivore";
 
     public static final int KRAKEN_RPS = 520; // max rps
+   public static final double STALL_TORQUE = 7.09;
+    public static final double STALL_CURRENT = 370;
+    public static final double TORQUE_CONSTANT = STALL_TORQUE/STALL_CURRENT;
+    public static final double EFFICIENCY = 0.9;
   }
 
   public static class ShooterConstants {
@@ -89,14 +93,6 @@ public final class Constants {
     public static final double INTAKE_ROLLER_OUT = -0.05; // OUT IS NEGATIVE FOR ROLLER
 
     public static final double INTAKING_POSITION = 31; //34
-  }
-
-  public static class ClimberConstants {
-    public static final double STALL_TORQUE = 7.09;
-    public static final double STALL_CURRENT = 370;
-    public static final double TORQUE_CONSTANT = STALL_TORQUE/STALL_CURRENT;
-    public static final double EFFICIENCY = 0.9;
-    public static final double GEAR_RATIO = 12; // 12:1
   }
 
   public static class VisionSubsystem {

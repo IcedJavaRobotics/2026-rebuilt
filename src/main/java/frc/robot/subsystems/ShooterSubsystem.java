@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.LauncherPhysics;
-import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.Constants.ShooterConstants;
 
@@ -126,13 +125,13 @@ public class ShooterSubsystem extends SubsystemBase {
   // A series of methods used to obtain information about the motors
   private double getLeaderTorque(){
     double currentAmps = ShooterMotorLeader.getStatorCurrent().getValueAsDouble();
-    double motorTorque = currentAmps * ClimberConstants.TORQUE_CONSTANT;
-    return motorTorque * ClimberConstants.EFFICIENCY;
+    double motorTorque = currentAmps * HardwareConstants.TORQUE_CONSTANT;
+    return motorTorque * HardwareConstants.EFFICIENCY;
   }
   private double getFollowerTorque(){
     double currentAmps = ShooterMotorFollower.getStatorCurrent().getValueAsDouble();
-    double motorTorque = currentAmps * ClimberConstants.TORQUE_CONSTANT;
-    return motorTorque * ClimberConstants.EFFICIENCY;
+    double motorTorque = currentAmps * HardwareConstants.TORQUE_CONSTANT;
+    return motorTorque * HardwareConstants.EFFICIENCY;
   }
   /**
    * Adds information about the shooter motors to smartdashboard
