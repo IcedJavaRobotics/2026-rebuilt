@@ -105,7 +105,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
                       
 
-                              this.getSwerveDrive().setGyro(new Rotation3d(0, 0, 180));
+                              this.getSwerveDrive().setGyro(new Rotation3d(0, 0, 0));
   }
 
   public void resetPose(Pose2d pose) {

@@ -26,13 +26,14 @@ import frc.robot.Constants.IntakeConstants;
 public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new IntakeSubsystem. */
 
-  PIDController elevatorPID = new PIDController(0.03, 0, 0);
+  PIDController elevatorPID = new PIDController(0.02, 0, 0.001);
 
   TalonFX intakeElevatorMotor;
   TalonFX intakeElevatorFollower;
 
   TalonFX intakeRollerMotor;
 
+  public boolean freshlyZeroed = false;
 
   public IntakeSubsystem() {
 
@@ -79,21 +80,28 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void setIntake(double speed){
+    freshlyZeroed = false;
     intakeElevatorMotor.set(speed);
   }
 
   // I 
   public void goOut(){
-    if((getPosition()<=(IntakeConstants.INTAKING_POSITION-22))){
-      setIntake(0.2);
-    } else if((getPosition()<=(IntakeConstants.INTAKING_POSITION-3))){
-      setIntake(0.5);
-    } else if((getPosition()<=(IntakeConstants.INTAKING_POSITION-1))){
-      setIntake(0.2);
-    }else {
-      setIntake(0);
-    }
+    // if((getPosition()<=(IntakeConstants.INTAKING_POSITION-22))){
+    //   setIntake(0.2);
+    // } else if((getPosition()<=(IntakeConstants.INTAKING_POSITION-3))){
+    //   setIntake(0.5);
+    // } else if((getPosition()<=(IntakeConstants.INTAKING_POSITION-1))){
+    //   setIntake(0.2);
+    // }else {
+    //   setIntake(0);
+    // }
     //setIntake(elevatorPID.calculate(getPosition(),IntakeConstants.INTAKING_POSITION));
+    setIntake(elevatorPID.calculate(getPosition(), IntakeConstants.INTAKING_POSITION));
+  }
+
+  public void zeroOutwards(){
+    setIntake(IntakeConstants.INTAKING_POSITION+IntakeConstants.MARGIN);
+    freshlyZeroed = true;
   }
 
   public double getPosition(){
@@ -125,13 +133,17 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void panicReset(){
-    intakeElevatorMotor.set(elevatorPID.calculate(intakeElevatorMotor.getPosition().getValueAsDouble(), 3));
+    setIntake(elevatorPID.calculate(intakeElevatorMotor.getPosition().getValueAsDouble(), 3));
   }
 
   public Command resetElevator(BooleanSupplier supplier){
       return run(() -> {
           this.defaultReset(supplier.getAsBoolean());
       });
+  }
+
+  public boolean isCrying(){
+    return false;
   }
 
   @Override

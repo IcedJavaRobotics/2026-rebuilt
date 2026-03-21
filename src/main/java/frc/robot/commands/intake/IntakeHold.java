@@ -32,12 +32,18 @@ public class IntakeHold extends Command {
   @Override
   public void execute() {
     //intakeSubsystem.setRoller(IntakeConstants.AUTOMATIC_INTAKE_SPEED);
-    intakeSubsystem.goOut();
+    if(intakeSubsystem.freshlyZeroed == false){
+      intakeSubsystem.goOut();
+    }
     if(intakeSubsystem.getPosition() >= (IntakeConstants.INTAKING_POSITION-2)){
       intakeSubsystem.setRollerToTestSpeed();
     } else{
       intakeSubsystem.stopRoller();
     }
+    if(intakeSubsystem.isCrying()){
+      intakeSubsystem.zeroOutwards();
+      intakeSubsystem.stopIntake();
+    } 
   }
 
   // Called once the command ends or is interrupted.
