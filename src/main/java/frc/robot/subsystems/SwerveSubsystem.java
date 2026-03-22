@@ -67,13 +67,13 @@ public class SwerveSubsystem extends SubsystemBase {
       throw new RuntimeException(e);
     }
 
-    RobotConfig config = null;
-    try {
-      config = RobotConfig.fromGUISettings();
-    } catch (IOException | ParseException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+    // RobotConfig config = null;
+    // try {
+    //   config = RobotConfig.fromGUISettings();
+    // } catch (IOException | ParseException e) {
+    //   // TODO Auto-generated catch block
+    //   e.printStackTrace();
+    // }
 
                         // try{
                         //         config = RobotConfig.fromGUISettings();
@@ -164,7 +164,7 @@ public ChassisSpeeds getRobotRelativeSpeeds(){
     LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight-sauron");
     if(limelightMeasurement.tagCount >= 2){
       swerveDrive.addVisionMeasurement(limelightMeasurement.pose, limelightMeasurement.timestampSeconds, VecBuilder.fill(.7,.7,99999));
-      System.out.println("POSE UPDATED");
+      //System.out.println("POSE UPDATED");
     }
   }
 

@@ -188,7 +188,7 @@ public class RobotContainer {
                 // Starts shooter
                 shootingTrigger.whileTrue(new FullShootCommand(shooterSubsystem, spindexerSubsystem, intakeSubsystem, limelightSubsystem));
                 // Full intake command/Hold Intake (Holding makes intake elevator and rollers start, letting go resets)
-                intakeTrigger.whileTrue(new IntakeHold(intakeSubsystem));
+                intakeTrigger.whileTrue(new IntakeHold(intakeSubsystem).andThen(new PullIntakeInCommand(intakeSubsystem)));
 
 
 

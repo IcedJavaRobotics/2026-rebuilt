@@ -85,14 +85,15 @@ public final class Constants {
 
   public static class IntakeConstants {
     // Speeds for intake
-    public static final double AUTOMATIC_INTAKE_SPEED = 0.3;
+    public static final double AUTOMATIC_INTAKE_SPEED = 0.4;
     public static final double MANUAL_INTAKE_SPEED = 0.5;
     public static final double MANUAL_SHUFFLE_SPEED = 0.1; // hold this when going over the bump to ensure balls dont fall out.
     public static final double INTAKE_ELEVATOR_IN = -0.3; // IN IS NEGATIVE FOR SHOOTER
     public static final double INTAKE_ELEVATOR_OUT = 0.3;
     public static final double INTAKE_ROLLER_OUT = -0.05; // OUT IS NEGATIVE FOR ROLLER
 
-    public static final double INTAKING_POSITION = 32; //34
+    public static final double INTAKING_POSITION = 31.5; //34
+    public static final double HOLDING_POSITION = 24;
     public static final double MARGIN = 0.5;
   }
 

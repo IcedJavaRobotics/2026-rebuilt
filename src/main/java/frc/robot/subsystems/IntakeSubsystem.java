@@ -44,7 +44,7 @@ public class IntakeSubsystem extends SubsystemBase {
      System.out.println("STATUS OF INTAKE MOTOR FOLLOWING: " + intakeElevatorFollower.setControl(new Follower(HardwareConstants.INTAKE_ELEVATOR_ID, MotorAlignmentValue.Aligned))); 
     
 
-    SmartDashboard.putNumber("roller-test-speed", -0.35); //negative is the right way
+    SmartDashboard.putNumber("roller-test-speed", IntakeConstants.AUTOMATIC_INTAKE_SPEED); //negative is the right way
   } 
 
   // Elevator
@@ -66,7 +66,7 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void agitate(){
-    intakeRollerMotor.set(-0.2);
+    intakeRollerMotor.set(-0.1);
   }
   public void setRoller(double speed){
     intakeRollerMotor.set(speed);
