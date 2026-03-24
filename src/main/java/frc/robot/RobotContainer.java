@@ -155,12 +155,13 @@ public class RobotContainer {
                 new JoystickButton(driverController, XboxController.Button.kB.value)
                         .whileTrue(new ZeroGyro(driveSubsystem));  //zero gyro on B
                 
-                new JoystickButton(driverController, XboxController.Button.kA.value)
-                        .whileTrue(new SpindexerCommand(spindexerSubsystem));
+                // new JoystickButton(driverController, XboxController.Button.kA.value)
+                //         .whileTrue(new SpindexerCommand(spindexerSubsystem));
                 
-                new JoystickButton(driverController, XboxController.Button.kB.value)
-                        .whileTrue(new StartShooter(shooterSubsystem));
+                // new JoystickButton(driverController, XboxController.Button.kB.value)
+                //         .whileTrue(new StartShooter(shooterSubsystem));
 
+                // Right trigger locks up wheels
                 lockTrigger.whileTrue(new LockUpWheels(driveSubsystem));
 
                 // ----------------------- AUX DRIVER CONTROLS -----------------------------------------------------------------------
