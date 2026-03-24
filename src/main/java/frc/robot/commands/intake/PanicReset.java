@@ -29,11 +29,20 @@ public class PanicReset extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    intakeSubsystem.stopIntake();
+    intakeSubsystem.stopRoller();
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    if(intakeSubsystem.isCrying()){
+      return true;
+    }
+    if(intakeSubsystem.getPosition() <= 1){
+      return true;
+    }
     return false;
   }
 }

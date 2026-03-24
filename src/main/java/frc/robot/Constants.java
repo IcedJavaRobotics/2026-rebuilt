@@ -95,6 +95,7 @@ public final class Constants {
     public static final double INTAKING_POSITION = 31.5; //34
     public static final double HOLDING_POSITION = 24;
     public static final double MARGIN = 0.5;
+    public static final double TORQUE_OVERLOAD = 20;
   }
 
   public static class VisionSubsystem {

@@ -26,7 +26,8 @@ import frc.robot.Constants.IntakeConstants;
 public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new IntakeSubsystem. */
 
-  PIDController elevatorPID = new PIDController(0.02, 0, 0.001);
+  PIDController elevatorPID = new PIDController(0.03, 0, 0.001);
+  PIDController panicPID = new PIDController(0.05, 0, 0.002);
 
   TalonFX intakeElevatorMotor;
   TalonFX intakeElevatorFollower;
@@ -137,7 +138,7 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void panicReset(){
-    setIntake(elevatorPID.calculate(intakeElevatorMotor.getPosition().getValueAsDouble(), 3));
+    setIntake(panicPID.calculate(intakeElevatorMotor.getPosition().getValueAsDouble(), 3));
   }
 
   public Command resetElevator(BooleanSupplier supplier){
@@ -147,15 +148,34 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public boolean isCrying(){
+    if(getTorque() >= IntakeConstants.TORQUE_OVERLOAD){
+      System.out.println("WAAAAAAAAAAAAAAAAAAAAAAH");
+      return true;
+    }
     return false;
   }
+
+  private double getLeaderTorque(){
+    double currentAmps = intakeElevatorMotor.getStatorCurrent().getValueAsDouble();
+    double motorTorque = currentAmps * HardwareConstants.TORQUE_CONSTANT;
+    return motorTorque * HardwareConstants.EFFICIENCY;
+  }
+  private double getFollowerTorque(){
+    double currentAmps = intakeElevatorFollower.getStatorCurrent().getValueAsDouble();
+    double motorTorque = currentAmps * HardwareConstants.TORQUE_CONSTANT;
+    return motorTorque * HardwareConstants.EFFICIENCY;
+  }
+  private double getTorque(){
+    return (0.5 * (getLeaderTorque() + getFollowerTorque()));
+  }
+
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("elevatorEncoder", intakeElevatorMotor.getPosition().getValueAsDouble());
 
-    SmartDashboard.putNumber("intake torque current", intakeElevatorMotor.getTorqueCurrent().getValueAsDouble());
+    SmartDashboard.putNumber("intake torque current", getTorque());
     SmartDashboard.putNumber("intake elevator speed", intakeElevatorMotor.getVelocity().getValueAsDouble());
     
   }

@@ -181,6 +181,8 @@ public class RobotContainer {
                 // Shooter Reverse
                 new JoystickButton(auxController, XboxController.Button.kRightBumper.value)
                         .whileTrue(new ShooterReverse(shooterSubsystem));
+                new JoystickButton(auxController, XboxController.Button.kLeftBumper.value)
+                        .whileTrue(new PanicReset(intakeSubsystem));
 
                 // Just shoot
                 new JoystickButton(auxController, XboxController.Button.kStart.value)
