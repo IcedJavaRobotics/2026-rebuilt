@@ -26,8 +26,8 @@ import frc.robot.Constants.IntakeConstants;
 public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new IntakeSubsystem. */
 
-  PIDController elevatorPID = new PIDController(0.03, 0, 0.001);
-  PIDController panicPID = new PIDController(0.05, 0, 0.002);
+  PIDController elevatorPID = new PIDController(0.02, 0, 0.001);
+  PIDController panicPID = new PIDController(0.03, 0, 0.001);
 
   TalonFX intakeElevatorMotor;
   TalonFX intakeElevatorFollower;
@@ -73,7 +73,7 @@ public class IntakeSubsystem extends SubsystemBase {
     intakeRollerMotor.set(speed);
   }
   public void setRollerToTestSpeed(){
-    setRoller(SmartDashboard.getNumber("roller-test-speed", 0));
+    setRoller(-1);
   }
 
   public void stopRoller(){
@@ -176,8 +176,8 @@ public class IntakeSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("elevatorEncoder", intakeElevatorMotor.getPosition().getValueAsDouble());
 
     SmartDashboard.putNumber("intake torque current", getTorque());
-    SmartDashboard.putNumber("intake elevator speed", intakeElevatorMotor.getVelocity().getValueAsDouble());
-    
+    SmartDashboard.putNumber("intake elevator rpm", intakeElevatorMotor.getVelocity().getValueAsDouble() * 60); // RPM
+  
   }
 
 }

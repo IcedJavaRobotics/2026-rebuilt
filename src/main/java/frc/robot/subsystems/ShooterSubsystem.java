@@ -115,7 +115,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
   
   public boolean isAtFullSpeed(){
-    if(this.getVelocity() <= -55){
+    if(this.getVelocity() <= (this.desiredSpeed*100)){
       return true;
     }
     return false;

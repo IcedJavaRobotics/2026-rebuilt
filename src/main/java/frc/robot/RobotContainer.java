@@ -149,14 +149,14 @@ public class RobotContainer {
                 new Trigger(driverController::getRightBumperButton).whileTrue(driveRobotOriented);
 
                 // Full intake command/Hold Intake (Holding makes intake elevator and rollers start, letting go resets)
-                intakeTrigger.whileTrue(new IntakeHold(intakeSubsystem).andThen(new PullIntakeInCommand(intakeSubsystem)));
+                intakeTrigger.whileTrue(new IntakeHold(intakeSubsystem)).onFalse(new PullIntakeInCommand(intakeSubsystem));
                 
                 // B button causes the driver to zero their controller
                 new JoystickButton(driverController, XboxController.Button.kB.value)
                         .whileTrue(new ZeroGyro(driveSubsystem));  //zero gyro on B
                 
-                // new JoystickButton(driverController, XboxController.Button.kA.value)
-                //         .whileTrue(new SpindexerCommand(spindexerSubsystem));
+                new JoystickButton(driverController, XboxController.Button.kA.value)
+                        .whileTrue(new IntakeRollerTest(intakeSubsystem));
                 
                 // new JoystickButton(driverController, XboxController.Button.kB.value)
                 //         .whileTrue(new StartShooter(shooterSubsystem));

@@ -35,7 +35,7 @@ public class IntakeHold extends Command {
     if(intakeSubsystem.freshlyZeroed == false){
       intakeSubsystem.goOut();
     }
-    if(intakeSubsystem.getPosition() >= (IntakeConstants.INTAKING_POSITION-2)){
+    if(intakeSubsystem.getPosition() >= (IntakeConstants.INTAKING_POSITION-IntakeConstants.START_ROLLER_MARGIN)){
       intakeSubsystem.setRollerToTestSpeed();
     } else{
       intakeSubsystem.stopRoller();

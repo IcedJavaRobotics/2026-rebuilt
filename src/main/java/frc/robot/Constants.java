@@ -85,8 +85,8 @@ public final class Constants {
 
   public static class IntakeConstants {
     // Speeds for intake
-    public static final double AUTOMATIC_INTAKE_SPEED = 0.4;
-    public static final double MANUAL_INTAKE_SPEED = 0.5;
+    public static final double AUTOMATIC_INTAKE_SPEED = -1;
+    //public static final double MANUAL_INTAKE_SPEED = 0.5;
     public static final double MANUAL_SHUFFLE_SPEED = 0.1; // hold this when going over the bump to ensure balls dont fall out.
     public static final double INTAKE_ELEVATOR_IN = -0.3; // IN IS NEGATIVE FOR SHOOTER
     public static final double INTAKE_ELEVATOR_OUT = 0.3;
@@ -96,6 +96,7 @@ public final class Constants {
     public static final double HOLDING_POSITION = 24;
     public static final double MARGIN = 0.5;
     public static final double TORQUE_OVERLOAD = 20;
+    public static final double START_ROLLER_MARGIN = 4;
   }
 
   public static class VisionSubsystem {
