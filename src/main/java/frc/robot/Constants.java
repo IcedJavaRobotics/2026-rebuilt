@@ -67,7 +67,7 @@ public final class Constants {
   public static class ShooterConstants {
 
     public static final double GEAR_RATIO = 1;
-    public static final double DEFAULT_SHOOTER_SPEED = -0.65; //made negative after cabarrus change
+    public static final double DEFAULT_SHOOTER_SPEED = -0.57; //made negative after cabarrus change
     public static final double REVERSE_SHOOTER_SPEED = 0.6;
     public static final double DESIRED_SPEED_INTERVAL = 0.01;
     public static final double SHOOTING_DEADZONE = 0.05;
@@ -80,7 +80,7 @@ public final class Constants {
   public static class SpindexerConstants {
     // Speeds for spindexer
     public static final double TESTING_SPEED = -0.2;
-    public static final double MANUAL_NORMAL_SPEED = -0.75;
+    public static final double MANUAL_NORMAL_SPEED = -0.80;
   }
 
   public static class IntakeConstants {

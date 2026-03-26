@@ -20,6 +20,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import swervelib.SwerveInputStream;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -82,7 +84,7 @@ public class RobotContainer {
 
 
         BooleanSupplier switchEnabled = ( () -> getSwitch());
-        //private final SendableChooser<Command> autoChooser;
+        private final SendableChooser<Command> autoChooser;
 
         PIDController headingController = new PIDController(0.015, 0, 0.001); // PID for making robot automatically face the hub
 
@@ -104,11 +106,11 @@ public class RobotContainer {
                 System.out.println("Spaghetti code.........100%");
                 //intakeSubsystem.setDefaultCommand(resetIntake);     //.onlyIf(switchEnabled));
      
-                //autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be
-                // `Commands.none()`
-                //SmartDashboard.putData("AutoSelec", autoChooser);
+                autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be
+                SmartDashboard.putData("AutoSelec", autoChooser);
 
                 initializeDashboard();
+                setupNamedCommands();
                 System.out.println("switch: " + getSwitch());
         }
 
@@ -192,7 +194,7 @@ public class RobotContainer {
                         .whileTrue(new SpindexerCommand(spindexerSubsystem));
 
                 // Starts shooter
-                shootingTrigger.whileTrue(new FullShootCommand(shooterSubsystem, spindexerSubsystem, intakeSubsystem, limelightSubsystem));
+                shootingTrigger.whileTrue(new FullShootCommand(shooterSubsystem, spindexerSubsystem, limelightSubsystem));
 
 
 
@@ -235,6 +237,9 @@ public class RobotContainer {
                 SmartDashboard.putBoolean("leds on", false);
         }
 
+        private void setupNamedCommands(){
+                NamedCommands.registerCommand("HoldShoot", new FullShootCommand(shooterSubsystem, spindexerSubsystem, limelightSubsystem));
+        }
         /**
          * Sets up various things of the driver station
          * - Silences joystick warnings
@@ -270,10 +275,16 @@ public class RobotContainer {
          */
         public Command getAutonomousCommand() { 
                 //return autoChooser.getSelected(); 
-                 return new SequentialCommandGroup(
+                return getTerribleShittyAutonomous();
+
+        }
+
+        private Command getTerribleShittyAutonomous(){
+                return new SequentialCommandGroup(
                         new TurnOnShooter(shooterSubsystem),
                         new SetIntakeOut(intakeSubsystem),
                         new WaitCommand(1),
+                        new TurnOnSpindexer(spindexerSubsystem),
                         new SetIntakeIn(intakeSubsystem),
                         new WaitCommand(0.7),
                         new SetIntakeOut(intakeSubsystem),
@@ -285,6 +296,7 @@ public class RobotContainer {
                         new SetIntakeIn(intakeSubsystem),
                         new WaitCommand(0.7),
                         new SetIntakeOff(intakeSubsystem),
+                        new TurnOffSpindexer(spindexerSubsystem),
                         new TurnOffShooter(shooterSubsystem)
                  );
         }

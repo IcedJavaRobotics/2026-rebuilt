@@ -67,7 +67,7 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void agitate(){
-    intakeRollerMotor.set(-0.1);
+    intakeRollerMotor.set(-0.8);
   }
   public void setRoller(double speed){
     intakeRollerMotor.set(speed);

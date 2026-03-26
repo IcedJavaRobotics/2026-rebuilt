@@ -21,7 +21,6 @@ public class TurnOnShooter extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    shooterSubsystem.setDesiredSpeed(0.6);
     shooterSubsystem.startShooting();
   }
 }

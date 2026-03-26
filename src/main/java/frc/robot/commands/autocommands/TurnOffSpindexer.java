@@ -6,21 +6,22 @@ package frc.robot.commands.autocommands;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.SpindexerSubsystem;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class TurnOffShooter extends InstantCommand {
-  ShooterSubsystem shooterSubsystem;
-  public TurnOffShooter(ShooterSubsystem shooterSubsystem) {
-    this.shooterSubsystem = shooterSubsystem;
-    addRequirements(shooterSubsystem);
+public class TurnOffSpindexer extends InstantCommand {
+  SpindexerSubsystem spindexerSubsystem;
+  public TurnOffSpindexer(SpindexerSubsystem spindexerSubsystem) {
+    this.spindexerSubsystem = spindexerSubsystem;
+    addRequirements(spindexerSubsystem);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    shooterSubsystem.stopShooting();
+    spindexerSubsystem.stop();
   }
 }

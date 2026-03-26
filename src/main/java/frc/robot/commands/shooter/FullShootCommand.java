@@ -14,16 +14,14 @@ import frc.robot.subsystems.SpindexerSubsystem;
 public class FullShootCommand extends Command {
   ShooterSubsystem shooterSubsystem;
   SpindexerSubsystem spindexerSubsystem;
-  IntakeSubsystem intakeSubsystem;
   LimelightSubsystem limelightSubsystem;
   /** Creates a new FullShootCommand. */
-  public FullShootCommand(  ShooterSubsystem shooterSubsystem,SpindexerSubsystem spindexerSubsystem,IntakeSubsystem intakeSubsystem,LimelightSubsystem limelightSubsystem) {
-    this.intakeSubsystem = intakeSubsystem;
+  public FullShootCommand(  ShooterSubsystem shooterSubsystem,SpindexerSubsystem spindexerSubsystem,LimelightSubsystem limelightSubsystem) {
     this.shooterSubsystem = shooterSubsystem;
     this.spindexerSubsystem = spindexerSubsystem;
     this.limelightSubsystem = limelightSubsystem;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(intakeSubsystem,shooterSubsystem,limelightSubsystem,spindexerSubsystem);
+    addRequirements(shooterSubsystem,limelightSubsystem,spindexerSubsystem);
   }
 
   // Called when the command is initially scheduled.
@@ -53,8 +51,6 @@ public class FullShootCommand extends Command {
   public void end(boolean interrupted) {
     spindexerSubsystem.stop();
     shooterSubsystem.stopShooting();
-    intakeSubsystem.stopIntake();
-    intakeSubsystem.stopRoller();
   }
 
   // Returns true when the command should end.
