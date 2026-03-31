@@ -115,7 +115,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
   
   public boolean isAtFullSpeed(){
-    if(this.getVelocity() <= (this.desiredSpeed*90)){
+    if(this.getVelocity() <= (this.desiredSpeed*84)){
       return true;
     }
     return false;
@@ -163,6 +163,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
       SmartDashboard.putNumber("Shooter Velocity", this.getVelocity());
       SmartDashboard.putNumber("estimated shooter velocity", launcherCalculator.getVelocity(this.desiredSpeed));
+      SmartDashboard.putBoolean("IsFullSpeed", isAtFullSpeed());
   }
 
   @Override

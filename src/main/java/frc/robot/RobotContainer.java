@@ -72,18 +72,19 @@ public class RobotContainer {
         // Initialize Controllers
         private final XboxController driverController = new XboxController(DriverConstants.MAIN_DRIVER_PORT);
         private final XboxController auxController = new XboxController(DriverConstants.AUX_DRIVER_PORT);
-        private final Joystick driverStation = new Joystick(DriverConstants.DRIVER_STATION_PORT);
+        //private final Joystick driverStation = new Joystick(DriverConstants.DRIVER_STATION_PORT);
 
         // Triggers for more control
-        JoystickButton manualSwitch = new JoystickButton(driverStation, 7);
-        Trigger shootcontrolSwitch = new Trigger( () -> getSwitch());
+        //JoystickButton manualSwitch = new JoystickButton(driverStation, 7);
+        // Trigger shootcontrolSwitch = new Trigger( () -> getSwitch());
         Trigger shootingTrigger = new Trigger( () -> getRightAuxTriggerValue());
-        Trigger intakeTrigger = new Trigger( () -> getLeftDriverTriggerValue());
+        Trigger manualShootingTrigger = new Trigger( () -> getLeftAuxTriggerValue());
 
+        Trigger intakeTrigger = new Trigger( () -> getLeftDriverTriggerValue());
         Trigger lockTrigger = new Trigger( () -> getRightDriverTriggerValue());
 
 
-        BooleanSupplier switchEnabled = ( () -> getSwitch());
+        // BooleanSupplier switchEnabled = ( () -> getSwitch());
         private final SendableChooser<Command> autoChooser;
 
         PIDController headingController = new PIDController(0.015, 0, 0.001); // PID for making robot automatically face the hub
@@ -111,7 +112,7 @@ public class RobotContainer {
 
                 initializeDashboard();
                 setupNamedCommands();
-                System.out.println("switch: " + getSwitch());
+                // System.out.println("switch: " + getSwitch());
         }
 
 
@@ -127,7 +128,7 @@ public class RobotContainer {
 
         Command driveFieldOrientedAngularVelocity = driveSubsystem.driveFieldOriented(driveAngularVelocity);
         Command driveRobotOriented = driveSubsystem.driveFieldOriented(driveRobotOrientedVelocity);
-        Command resetIntake = intakeSubsystem.resetElevator(() -> getSwitch());
+        // Command resetIntake = intakeSubsystem.resetElevator(() -> getSwitch());
 
         /**
          * Use this method to define your trigger->command mappings. Triggers can be
@@ -157,45 +158,55 @@ public class RobotContainer {
                 new JoystickButton(driverController, XboxController.Button.kB.value)
                         .whileTrue(new ZeroGyro(driveSubsystem));  //zero gyro on B
                 
-                new JoystickButton(driverController, XboxController.Button.kA.value)
-                        .whileTrue(new IntakeRollerTest(intakeSubsystem));
+                // new JoystickButton(driverController, XboxController.Button.kA.value)
+                //         .whileTrue(new IntakeRollerTest(intakeSubsystem));
                 
                 // new JoystickButton(driverController, XboxController.Button.kB.value)
                 //         .whileTrue(new StartShooter(shooterSubsystem));
 
+                new JoystickButton(driverController, XboxController.Button.kStart.value)
+                        .whileTrue(new IntakeElevatorOut(intakeSubsystem));
+                new JoystickButton(driverController, XboxController.Button.kBack.value)
+                        .whileTrue(new IntakeElevatorIn(intakeSubsystem));
+                new JoystickButton(driverController, XboxController.Button.kA.value)
+                        .whileTrue(new ShimmyIntakeCommand(intakeSubsystem));
                 // Right trigger locks up wheels
                 lockTrigger.whileTrue(new LockUpWheels(driveSubsystem));
 
                 // ----------------------- AUX DRIVER CONTROLS -----------------------------------------------------------------------
 
                 // Elevator Out
-                new JoystickButton(auxController, XboxController.Button.kY.value)
-                         .whileTrue(new IntakeElevatorOut(intakeSubsystem));
+                // new JoystickButton(auxController, XboxController.Button.kY.value)
+                //          .whileTrue(new IntakeElevatorOut(intakeSubsystem));
                 // Elevator In
-                new JoystickButton(auxController, XboxController.Button.kB.value)
-                         .whileTrue(new IntakeElevatorIn(intakeSubsystem));
+                // new JoystickButton(auxController, XboxController.Button.kB.value)
+                //          .whileTrue(new IntakeElevatorIn(intakeSubsystem));
                 // Shooter Power down
-                new JoystickButton(auxController, XboxController.Button.kX.value)
+                new JoystickButton(auxController, XboxController.Button.kBack.value)
                         .whileTrue(new TurnDownShooter(shooterSubsystem));
                 // Shooter Power up
-                new JoystickButton(auxController, XboxController.Button.kA.value)
+                new JoystickButton(auxController, XboxController.Button.kStart.value)
                         .whileTrue(new TurnUpShooter(shooterSubsystem));
                 // Shooter Reverse
-                new JoystickButton(auxController, XboxController.Button.kRightBumper.value)
+                new JoystickButton(auxController, XboxController.Button.kY.value)
                         .whileTrue(new ShooterReverse(shooterSubsystem));
+                new JoystickButton(auxController, XboxController.Button.kA.value)
+                        .whileTrue(new SpindexerCommandReverse(spindexerSubsystem));
+                new JoystickButton(auxController, XboxController.Button.kX.value)
+                        .whileTrue(new SpindexerCommand(spindexerSubsystem));
                 new JoystickButton(auxController, XboxController.Button.kLeftBumper.value)
                         .whileTrue(new PanicReset(intakeSubsystem));
 
                 // Just shoot
-                new JoystickButton(auxController, XboxController.Button.kStart.value)
-                        .whileTrue(new StartShooter(shooterSubsystem));
+                // new JoystickButton(auxController, XboxController.Button.kStart.value)
+                //         .whileTrue(new StartShooter(shooterSubsystem));
                 // Just index
-                new JoystickButton(auxController, XboxController.Button.kBack.value)
+                new JoystickButton(auxController, XboxController.Button.kX.value)
                         .whileTrue(new SpindexerCommand(spindexerSubsystem));
 
                 // Starts shooter
-                shootingTrigger.whileTrue(new FullShootCommand(shooterSubsystem, spindexerSubsystem, limelightSubsystem));
-
+                shootingTrigger.whileTrue(new StartShooter(shooterSubsystem));
+                manualShootingTrigger.whileTrue(new SpindexerCommand(spindexerSubsystem));
 
 
 
@@ -203,6 +214,7 @@ public class RobotContainer {
 
                 // ----------------------- BUTTON BOARD CONTROLS ----------------------------------------------------------------------
                 
+                /* 
                 // Shooter Functions Check (Starts shooter)
                new JoystickButton(driverStation, DriverStationConstants.BOTTOM_LEFT)
                         .whileTrue(new StartShooter(shooterSubsystem));
@@ -221,7 +233,7 @@ public class RobotContainer {
                 // Shooter Reverse
                 new JoystickButton(driverStation, DriverStationConstants.TOP_RIGHT)
                         .whileTrue(new IntakeRollerTest(intakeSubsystem));
-
+                */
 
                 
         }
@@ -281,21 +293,47 @@ public class RobotContainer {
 
         private Command getTerribleShittyAutonomous(){
                 return new SequentialCommandGroup(
+                        // new TurnOnReverseSpindexer(spindexerSubsystem),
+                        // new WaitCommand(0.4),
+                        // new TurnOffSpindexer(spindexerSubsystem),
                         new TurnOnShooter(shooterSubsystem),
-                        new SetIntakeOut(intakeSubsystem),
-                        new WaitCommand(1),
+                        new WaitCommand(2),
                         new TurnOnSpindexer(spindexerSubsystem),
-                        new SetIntakeIn(intakeSubsystem),
-                        new WaitCommand(0.7),
+                        new WaitCommand(5),
+                        new TurnOnReverseSpindexer(spindexerSubsystem),
+                        new WaitCommand(1.5),
+                        new TurnOnSpindexer(spindexerSubsystem),
+                        new WaitCommand(1),
                         new SetIntakeOut(intakeSubsystem),
-                        new WaitCommand(0.7),
+                        new WaitCommand(0.9),
                         new SetIntakeIn(intakeSubsystem),
-                        new WaitCommand(0.7),
+                        new WaitCommand(0.8),
                         new SetIntakeOut(intakeSubsystem),
-                        new WaitCommand(0.7),
+                        new WaitCommand(0.8),
                         new SetIntakeIn(intakeSubsystem),
-                        new WaitCommand(0.7),
+                        new WaitCommand(0.8),
                         new SetIntakeOff(intakeSubsystem),
+                        new WaitCommand(2),
+                        new TurnOffSpindexer(spindexerSubsystem),
+                        new TurnOffShooter(shooterSubsystem)
+                 );
+        }
+                private Command getTerribleShittyAutonomousWithDelay(){
+                return new SequentialCommandGroup(
+                        // new TurnOnReverseSpindexer(spindexerSubsystem),
+                        // new WaitCommand(0.4),
+                        // new TurnOffSpindexer(spindexerSubsystem),
+                        new WaitCommand(7),
+                        new TurnOnShooter(shooterSubsystem),
+                        new WaitCommand(2),
+                        new TurnOnSpindexer(spindexerSubsystem),
+                        new WaitCommand(5),
+                        new TurnOnReverseSpindexer(spindexerSubsystem),
+                        new WaitCommand(1.5),
+                        new TurnOnSpindexer(spindexerSubsystem),
+                        new WaitCommand(1),
+                        new SetIntakeOff(intakeSubsystem),
+                        new WaitCommand(2),
                         new TurnOffSpindexer(spindexerSubsystem),
                         new TurnOffShooter(shooterSubsystem)
                  );
@@ -431,10 +469,10 @@ public class RobotContainer {
          * 
          * @return True if up, false if down
          */
-        private boolean getSwitch() {
-                SmartDashboard.putBoolean("switch", !manualSwitch.getAsBoolean());
-                return !manualSwitch.getAsBoolean();
-        }
+        // private boolean getSwitch() {
+        //         SmartDashboard.putBoolean("switch", !manualSwitch.getAsBoolean());
+        //         return !manualSwitch.getAsBoolean();
+        // }
 
         /**
          * 

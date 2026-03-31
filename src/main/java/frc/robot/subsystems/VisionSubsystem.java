@@ -28,6 +28,8 @@ public class VisionSubsystem extends SubsystemBase {
     // Add booleans of if cameras are connected into this camera layout tab 
   }
 
+
+
   public void setupVisionTab(){
     
     //Add camera connections to the vision tab as well

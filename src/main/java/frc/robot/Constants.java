@@ -67,7 +67,8 @@ public final class Constants {
   public static class ShooterConstants {
 
     public static final double GEAR_RATIO = 1;
-    public static final double DEFAULT_SHOOTER_SPEED = -0.57; //made negative after cabarrus change
+    public static final double DEFAULT_SHOOTER_SPEED = -0.59; //made negative after cabarrus change
+    public static final double AUTO_SHOOTER_SPEED = -0.56;
     public static final double REVERSE_SHOOTER_SPEED = 0.6;
     public static final double DESIRED_SPEED_INTERVAL = 0.01;
     public static final double SHOOTING_DEADZONE = 0.05;
@@ -95,8 +96,8 @@ public final class Constants {
     public static final double INTAKING_POSITION = 31.5; //34
     public static final double HOLDING_POSITION = 24;
     public static final double MARGIN = 0.5;
-    public static final double TORQUE_OVERLOAD = 20;
-    public static final double START_ROLLER_MARGIN = 4;
+    public static final double TORQUE_OVERLOAD = 0.7;
+    public static final double START_ROLLER_MARGIN = 6;
   }
 
   public static class VisionSubsystem {

@@ -2,45 +2,40 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-
-// shimmy shimmy ay shimmy oh shimmy ah
-// drank
-// swalalala
-// drank
-// swalalala
-
-
-package frc.robot.commands.intake;
+package frc.robot.commands.spindexer;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.SpindexerSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class ShimmyIntakeCommand extends Command {
-  /** Creates a new ShimmyIntakeCommand. */
+public class SpindexerCommandReverse extends Command {
 
-  IntakeSubsystem intakeSubsystem;
+  SpindexerSubsystem spindexerSubsystem;
+  /** Creates a new SpindexerCommand. */
+  public SpindexerCommandReverse(SpindexerSubsystem spindexerSubsystem) {
+    this.spindexerSubsystem = spindexerSubsystem;
 
-  public ShimmyIntakeCommand(IntakeSubsystem intakeSubsystem) {
-    this.intakeSubsystem = intakeSubsystem;
-    addRequirements(intakeSubsystem);
+    addRequirements(spindexerSubsystem);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    intakeSubsystem.agitate();
+    spindexerSubsystem.startReverse();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+  
+    spindexerSubsystem.runSpindexer();
+  }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    intakeSubsystem.stopRoller();
+    spindexerSubsystem.stop();
   }
 
   // Returns true when the command should end.

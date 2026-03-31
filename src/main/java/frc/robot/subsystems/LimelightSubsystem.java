@@ -111,6 +111,25 @@ public class LimelightSubsystem extends SubsystemBase {
 
     }
 
+    
+  public boolean isInRoughRange(){
+    if(getTa() >= 0.09 && getTa() <= 0.14){
+        return true;
+    }
+    return false;
+  }
+
+  public double accuracy(){
+    if(tagDetected() == false){
+        return 99;
+    }
+    if(getTa() >= 0.115){
+        return ((getTa()-0.115) * 100);
+    } else{
+        return ((0.115-getDistance()) * 100);
+    }
+
+  }
 
 
     @Override
@@ -124,6 +143,8 @@ public class LimelightSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("last apriltag", lastSeenApriltag);
         SmartDashboard.putNumber("distance", getDistance());
 
+        SmartDashboard.putBoolean("InRange", this.isInRoughRange());
+        SmartDashboard.putNumber("accuracy", accuracy());
 
     }
 

@@ -39,6 +39,9 @@ public class SpindexerSubsystem extends SubsystemBase {
   public void start(){
     set(SmartDashboard.getNumber("desired indexer speed", 0));
   }
+  public void startReverse(){
+    set(-SmartDashboard.getNumber("desired indexer speed", 0));
+  }
   public void startTest(){
     set(SmartDashboard.getNumber("spindexer-speed", 0));
   }

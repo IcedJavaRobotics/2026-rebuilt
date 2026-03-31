@@ -23,7 +23,6 @@ public class IntakeElevatorIn extends Command {
   @Override
   public void initialize() {
     intakeSubsystem.IntakeElevatorIn(Constants.IntakeConstants.INTAKE_ELEVATOR_IN);
-    intakeSubsystem.setIntake(-0.5);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

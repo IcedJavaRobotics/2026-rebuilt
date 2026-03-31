@@ -40,10 +40,7 @@ public class IntakeHold extends Command {
     } else{
       intakeSubsystem.stopRoller();
     }
-    if(intakeSubsystem.isCrying()){
-      intakeSubsystem.zeroOutwards();
-      intakeSubsystem.stopIntake();
-    } 
+
   }
 
   // Called once the command ends or is interrupted.
