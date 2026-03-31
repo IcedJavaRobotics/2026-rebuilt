@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.535954922894425,
+        "y": 7.214341637010676
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.664460260972717,
+        "y": 6.945361803084223
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.1581731909861217,
+        "y": 6.03083036773279
+      },
+      "prevControl": {
+        "x": 1.9422184411146297,
+        "y": 6.03083036773279
+      },
+      "nextControl": null,
+      "isLocked": true,
+      "linkedName": "Abouttopickupthebigpileofballs"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 1.0,
+    "maxAcceleration": 1.0,
+    "maxAngularVelocity": 100.54,
+    "maxAngularAcceleration": 40.72,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}

@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.LimelightHelpers;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,15 +25,23 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import swervelib.parser.SwerveParser;
 import swervelib.SwerveDrive;
 import swervelib.SwerveModule;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.LinearVelocityUnit;
+import edu.wpi.first.units.measure.LinearVelocity;
 
 public class SwerveSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
@@ -40,10 +49,13 @@ public class SwerveSubsystem extends SubsystemBase {
   File directory = new File(Filesystem.getDeployDirectory(), "swerve");
   SwerveDrive swerveDrive;
 
+
   public SwerveSubsystem() {
+      
+    LimelightHelpers.setCameraPose_RobotSpace("limelight-sauron", -0.2, 0, 0.52, 180, -22, 0);
     try {
       swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.DriverConstants.MAX_SPEED,
-          new Pose2d(new Translation2d(Units.feetToMeters(1),
+          new Pose2d(new Translation2d(Units.feetToMeters(3),
               Units.feetToMeters(4)),
               Rotation2d.fromDegrees(0))); //TODO: TEST CHANGING THESE VALUES
               
@@ -63,13 +75,6 @@ public class SwerveSubsystem extends SubsystemBase {
       e.printStackTrace();
     }
 
-                        try{
-                                config = RobotConfig.fromGUISettings();
-                              } catch (Exception e) {
-                                // Handle exception as needed
-                                e.printStackTrace();
-                              }
-                          
                               // Configure AutoBuilder last
                               AutoBuilder.configure(
                                       this::getPose, // Robot pose supplier
@@ -77,8 +82,8 @@ public class SwerveSubsystem extends SubsystemBase {
                                       this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                                       (speeds, feedforwards) -> driveRobotOriented(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
                                       new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                                              new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-                                              new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+                                              new PIDConstants(4.0, 0.0, 0.1), // Translation PID constants
+                                              new PIDConstants(1.2, 0.0, 0.1) // Rotation PID constants
                                       ),
                                         //new 
                                       config, // The robot configuration
@@ -97,7 +102,8 @@ public class SwerveSubsystem extends SubsystemBase {
                               );
 
                       
-
+                              swerveDrive.setAutoCenteringModules(false);
+                              this.getSwerveDrive().setGyro(new Rotation3d(0, 0, 0));
   }
 
   public void resetPose(Pose2d pose) {
@@ -139,11 +145,20 @@ public ChassisSpeeds getRobotRelativeSpeeds(){
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    //updateVisionOdometry();       COMMENTED OUT VISION UPDATING - RUNNING PURE ODOMETRY
     for (SwerveModule swerveModule : swerveDrive.getModules()) {
       SmartDashboard.putNumber(swerveModule.toString(), swerveModule.getAbsolutePosition());
     }
     SmartDashboard.putNumber("pose", this.getPose().getRotation().getDegrees());
     SmartDashboard.putNumber("yaw", swerveDrive.getYaw().getDegrees());
+  }
+
+  public void updateVisionOdometry(){
+    LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight-sauron");
+    if(limelightMeasurement.tagCount >= 2){
+      swerveDrive.addVisionMeasurement(limelightMeasurement.pose, limelightMeasurement.timestampSeconds, VecBuilder.fill(.7,.7,99999));
+      //System.out.println("POSE UPDATED");
+    }
   }
 
   @Override
@@ -197,4 +212,18 @@ public ChassisSpeeds getRobotRelativeSpeeds(){
   public void zeroGyro() {
     swerveDrive.zeroGyro();
   }
+
+  public void functionsCheck(ShuffleboardTab functionsCheckTab) {
+    
+  }
+
+
+  public void lockUpWheels(){
+
+
+    swerveDrive.lockPose();
+    
+  }
+
+
 }

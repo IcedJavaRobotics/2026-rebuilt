@@ -5,37 +5,51 @@
 package frc.robot;
 
 import frc.robot.Constants.DriverConstants;
+import frc.robot.Constants.DriverStationConstants;
+// import frc.robot.commands.RollerInCommand;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
-
-import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import swervelib.SwerveInputStream;
+
+import java.io.ObjectInputFilter.Status;
+import java.util.Map;
+import java.util.function.BooleanSupplier;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+// import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.*;
+import frc.robot.commands.autocommands.*;
+import frc.robot.commands.intake.*;
+import frc.robot.commands.shooter.*;
+import frc.robot.commands.spindexer.*;
+import frc.robot.commands.swerve.*;
 
 import java.util.Date;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+
 /**
  * This class is where the bulk of the robot should be declared. Since
  * Command-based is a
@@ -46,67 +60,313 @@ import java.time.format.DateTimeFormatter;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-        // The robot's subsystems and commands are defined here...
 
-        private final SwerveSubsystem drivebase = new SwerveSubsystem();
-        //private final SelectorSubsystem selectorSubsystem = new SelectorSubsystem(shoulderSubsystem, elevatorSubsystem,wristSubsystem);
+        // initialize subsystems
+        private final SwerveSubsystem driveSubsystem = new SwerveSubsystem();
+        private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+        private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
+        private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem();
+        private final VisionSubsystem visionSubsystem = new VisionSubsystem();
+        private final LimelightSubsystem limelightSubsystem = new LimelightSubsystem();
 
+        // Initialize Controllers
+        private final XboxController driverController = new XboxController(DriverConstants.MAIN_DRIVER_PORT);
+        private final XboxController auxController = new XboxController(DriverConstants.AUX_DRIVER_PORT);
+        //private final Joystick driverStation = new Joystick(DriverConstants.DRIVER_STATION_PORT);
+
+        // Triggers for more control
+        //JoystickButton manualSwitch = new JoystickButton(driverStation, 7);
+        // Trigger shootcontrolSwitch = new Trigger( () -> getSwitch());
+        Trigger shootingTrigger = new Trigger( () -> getRightAuxTriggerValue());
+        Trigger manualShootingTrigger = new Trigger( () -> getLeftAuxTriggerValue());
+
+        Trigger intakeTrigger = new Trigger( () -> getLeftDriverTriggerValue());
+        Trigger lockTrigger = new Trigger( () -> getRightDriverTriggerValue());
+
+
+        // BooleanSupplier switchEnabled = ( () -> getSwitch());
         private final SendableChooser<Command> autoChooser;
 
-        XboxController driverController = new XboxController(DriverConstants.MAIN_DRIVER_PORT);
-        XboxController auxController = new XboxController(DriverConstants.AUX_DRIVER_PORT);
-        private final Joystick driverStation = new Joystick(DriverConstants.DRIVER_STATION_PORT);
-
-        PIDController headingController = new PIDController(0.015, 0, 0.001);
+        PIDController headingController = new PIDController(0.015, 0, 0.001); // PID for making robot automatically face the hub
 
         private String formattedTime = "hi";
-
 
         /**
          * The container for the robot. Contains subsystems, OI devices, and commands.
          */
         public RobotContainer() {
+
+                // Configure the trigger bindings
+                headingController.enableContinuousInput(-180, 180); //Causes the pid for heading to loop along with the gyro
+                configureBindings();
+
+                // Setup default commands
+                driveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity); 
+                System.out.println("Awesome name.........100%");
+                System.out.println("Neuralink.........100%");
+                System.out.println("Spaghetti code.........100%");
+                //intakeSubsystem.setDefaultCommand(resetIntake);     //.onlyIf(switchEnabled));
+     
+                autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be
+                SmartDashboard.putData("AutoSelec", autoChooser);
+
+                initializeDashboard();
+                setupNamedCommands();
+                // System.out.println("switch: " + getSwitch());
+        }
+
+
+        SwerveInputStream driveAngularVelocity = SwerveInputStream.of(driveSubsystem.getSwerveDrive(),
+                        () -> driverController.getLeftY() * getMultiplier(),
+                        () -> driverController.getLeftX() * getMultiplier())
+                        .withControllerRotationAxis(() -> getRightX())
+                        .deadband(getDeadzone())
+                        .scaleTranslation(1)// Can be changed to alter speed
+                        .allianceRelativeControl(false);
+
+        SwerveInputStream driveRobotOrientedVelocity = driveAngularVelocity.copy().robotRelative(true).allianceRelativeControl(false);
+
+        Command driveFieldOrientedAngularVelocity = driveSubsystem.driveFieldOriented(driveAngularVelocity);
+        Command driveRobotOriented = driveSubsystem.driveFieldOriented(driveRobotOrientedVelocity);
+        // Command resetIntake = intakeSubsystem.resetElevator(() -> getSwitch());
+
+        /**
+         * Use this method to define your trigger->command mappings. Triggers can be
+         * created via the
+         * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
+         * an arbitrary
+         * predicate, or via the named factories in {@link
+         * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
+         * {@link
+         * CommandXboxController
+         * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
+         * PS4} controllers or
+         * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
+         * joysticks}.
+         */
+        private void configureBindings() {
+
+                // ----------------------- MAIN DRIVER CONTROLS ----------------------------------------------------------------------
+
+                // Left bumper causes straightforward driving
+                new Trigger(driverController::getRightBumperButton).whileTrue(driveRobotOriented);
+
+                // Full intake command/Hold Intake (Holding makes intake elevator and rollers start, letting go resets)
+                intakeTrigger.whileTrue(new IntakeHold(intakeSubsystem)).onFalse(new PullIntakeInCommand(intakeSubsystem));
+                
+                // B button causes the driver to zero their controller
+                new JoystickButton(driverController, XboxController.Button.kB.value)
+                        .whileTrue(new ZeroGyro(driveSubsystem));  //zero gyro on B
+                
+                // new JoystickButton(driverController, XboxController.Button.kA.value)
+                //         .whileTrue(new IntakeRollerTest(intakeSubsystem));
+                
+                // new JoystickButton(driverController, XboxController.Button.kB.value)
+                //         .whileTrue(new StartShooter(shooterSubsystem));
+
+                new JoystickButton(driverController, XboxController.Button.kStart.value)
+                        .whileTrue(new IntakeElevatorOut(intakeSubsystem));
+                new JoystickButton(driverController, XboxController.Button.kBack.value)
+                        .whileTrue(new IntakeElevatorIn(intakeSubsystem));
+                new JoystickButton(driverController, XboxController.Button.kA.value)
+                        .whileTrue(new ShimmyIntakeCommand(intakeSubsystem));
+                // Right trigger locks up wheels
+                lockTrigger.whileTrue(new LockUpWheels(driveSubsystem));
+
+                // ----------------------- AUX DRIVER CONTROLS -----------------------------------------------------------------------
+
+                // Elevator Out
+                // new JoystickButton(auxController, XboxController.Button.kY.value)
+                //          .whileTrue(new IntakeElevatorOut(intakeSubsystem));
+                // Elevator In
+                // new JoystickButton(auxController, XboxController.Button.kB.value)
+                //          .whileTrue(new IntakeElevatorIn(intakeSubsystem));
+                // Shooter Power down
+                new JoystickButton(auxController, XboxController.Button.kBack.value)
+                        .whileTrue(new TurnDownShooter(shooterSubsystem));
+                // Shooter Power up
+                new JoystickButton(auxController, XboxController.Button.kStart.value)
+                        .whileTrue(new TurnUpShooter(shooterSubsystem));
+                // Shooter Reverse
+                new JoystickButton(auxController, XboxController.Button.kY.value)
+                        .whileTrue(new ShooterReverse(shooterSubsystem));
+                new JoystickButton(auxController, XboxController.Button.kA.value)
+                        .whileTrue(new SpindexerCommandReverse(spindexerSubsystem));
+                new JoystickButton(auxController, XboxController.Button.kX.value)
+                        .whileTrue(new SpindexerCommand(spindexerSubsystem));
+                new JoystickButton(auxController, XboxController.Button.kLeftBumper.value)
+                        .whileTrue(new PanicReset(intakeSubsystem));
+
+                // Just shoot
+                // new JoystickButton(auxController, XboxController.Button.kStart.value)
+                //         .whileTrue(new StartShooter(shooterSubsystem));
+                // Just index
+                new JoystickButton(auxController, XboxController.Button.kX.value)
+                        .whileTrue(new SpindexerCommand(spindexerSubsystem));
+
+                // Starts shooter
+                shootingTrigger.whileTrue(new StartShooter(shooterSubsystem));
+                manualShootingTrigger.whileTrue(new SpindexerCommand(spindexerSubsystem));
+
+
+
+                //print "shut up you chud" - Antony
+
+                // ----------------------- BUTTON BOARD CONTROLS ----------------------------------------------------------------------
+                
+                /* 
+                // Shooter Functions Check (Starts shooter)
+               new JoystickButton(driverStation, DriverStationConstants.BOTTOM_LEFT)
+                        .whileTrue(new StartShooter(shooterSubsystem));
+                // Elevator Out
+                new JoystickButton(driverStation, DriverStationConstants.TOP_LEFT)
+                        .whileTrue(new IntakeElevatorOut(intakeSubsystem));
+                // Elevator In
+                new JoystickButton(driverStation, DriverStationConstants.MIDDLE_LEFT)
+                        .whileTrue(new IntakeElevatorIn(intakeSubsystem));
+                // Full intake command/Hold Intake (Holding makes intake elevator and rollers start, letting go resets)
+                new JoystickButton(driverStation, DriverStationConstants.MIDDLE_RIGHT)
+                        .whileTrue(new IntakeHold(intakeSubsystem));
+                // Zeroes the intake
+                new JoystickButton(driverStation, DriverStationConstants.BOTTOM_MIDDLE)
+                        .whileTrue(new ZeroIntake(intakeSubsystem));
+                // Shooter Reverse
+                new JoystickButton(driverStation, DriverStationConstants.TOP_RIGHT)
+                        .whileTrue(new IntakeRollerTest(intakeSubsystem));
+                */
+
+                
+        }
+
+        /**
+         * Sets up the Smartdashboard by adding all the values we will monitor on there
+         */
+        private void initializeDashboard(){
+                setupDriverstation();
+                
+                // Switches
+                SmartDashboard.putBoolean("auto intake inward", true);
+                SmartDashboard.putBoolean("leds on", false);
+        }
+
+        private void setupNamedCommands(){
+                NamedCommands.registerCommand("HoldShoot", new FullShootCommand(shooterSubsystem, spindexerSubsystem, limelightSubsystem));
+        }
+        /**
+         * Sets up various things of the driver station
+         * - Silences joystick warnings
+         * - 
+         */
+        private void setupDriverstation(){
+                DriverStation.silenceJoystickConnectionWarning(true);
+                SmartDashboard.putNumber("Match Number", DriverStation.getMatchNumber());
+                SmartDashboard.putString("Match type", DriverStation.getMatchType().toString());
+                SmartDashboard.putString("Alliance", DriverStation.getAlliance().get().toString());
+                SmartDashboard.putString("Competition", DriverStation.getEventName());
+                SmartDashboard.putNumber("Time left", DriverStation.getMatchTime());
+
+                // Adds time booted to the dashboard
                 Date currentDate = new Date();
                 LocalTime currentTime = LocalTime.now();
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
                 formattedTime = currentTime.format(formatter);
+        }
 
-                // Configure the trigger bindings
-                headingController.enableContinuousInput(-180, 180);
-                // configureNamedCommands();
-                configureBindings();
-                drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity); 
+        /**
+         * runs periodically to update the dashboards info with info that continuously updates
+         */
+        private void updateDashboard(){
+                SmartDashboard.putNumber("Time left", DriverStation.getMatchTime());
+        }
 
-                // elevatorSubsystem.setDefaultCommand(new RunCommand(() ->
-                // elevatorSubsystem.reset(), elevatorSubsystem));
-                // resets to 0
-                // shoulderSubsystem.setDefaultCommand(
-                // new RunCommand(() -> shoulderSubsystem.reset(() -> elevatorInEnough()),
-                // shoulderSubsystem));
 
-                DriverStation.silenceJoystickConnectionWarning(true);
-                autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be
-                // `Commands.none()`
-                SmartDashboard.putData("AutoSelec", autoChooser);
+        /**
+         * Use this to pass the autonomous command to the main {@link Robot} class.
+         *
+         * @return the command to run in autonomous
+         */
+        public Command getAutonomousCommand() { 
+                //return autoChooser.getSelected(); 
+                return getTerribleShittyAutonomous();
 
+        }
+
+        private Command getTerribleShittyAutonomous(){
+                return new SequentialCommandGroup(
+                        // new TurnOnReverseSpindexer(spindexerSubsystem),
+                        // new WaitCommand(0.4),
+                        // new TurnOffSpindexer(spindexerSubsystem),
+                        new TurnOnShooter(shooterSubsystem),
+                        new WaitCommand(2),
+                        new TurnOnSpindexer(spindexerSubsystem),
+                        new WaitCommand(5),
+                        new TurnOnReverseSpindexer(spindexerSubsystem),
+                        new WaitCommand(1.5),
+                        new TurnOnSpindexer(spindexerSubsystem),
+                        new WaitCommand(1),
+                        new SetIntakeOut(intakeSubsystem),
+                        new WaitCommand(0.9),
+                        new SetIntakeIn(intakeSubsystem),
+                        new WaitCommand(0.8),
+                        new SetIntakeOut(intakeSubsystem),
+                        new WaitCommand(0.8),
+                        new SetIntakeIn(intakeSubsystem),
+                        new WaitCommand(0.8),
+                        new SetIntakeOff(intakeSubsystem),
+                        new WaitCommand(2),
+                        new TurnOffSpindexer(spindexerSubsystem),
+                        new TurnOffShooter(shooterSubsystem)
+                 );
+        }
+                private Command getTerribleShittyAutonomousWithDelay(){
+                return new SequentialCommandGroup(
+                        // new TurnOnReverseSpindexer(spindexerSubsystem),
+                        // new WaitCommand(0.4),
+                        // new TurnOffSpindexer(spindexerSubsystem),
+                        new WaitCommand(7),
+                        new TurnOnShooter(shooterSubsystem),
+                        new WaitCommand(2),
+                        new TurnOnSpindexer(spindexerSubsystem),
+                        new WaitCommand(5),
+                        new TurnOnReverseSpindexer(spindexerSubsystem),
+                        new WaitCommand(1.5),
+                        new TurnOnSpindexer(spindexerSubsystem),
+                        new WaitCommand(1),
+                        new SetIntakeOff(intakeSubsystem),
+                        new WaitCommand(2),
+                        new TurnOffSpindexer(spindexerSubsystem),
+                        new TurnOffShooter(shooterSubsystem)
+                 );
         }
 
 
 
 
-        // private boolean elevatorInEnough() {
-        //         if (elevatorSubsystem.getElevatorEncoder() <= 50) {
-        //                 return true;
-        //         }
-        //         return false;
-        // }
 
+
+
+
+
+
+
+
+
+
+
+
+
+        // ----------------------------------------------------------------------------------------------------------------------------------------
+        // --------------------------UTILITY METHODS FOR THE CONTROLLERS---------------------------------------------------------------------------
+        // ----------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+                
         private double getDeadzone() {
-                // if (auxController.getRightX() >= 0.5 || auxController.getRightX() <= -0.5) {
-                //         return 0;
-                // } else if (getLeftDriverTriggerValue()) {
-                //         return 0;
-                // }
                 return DriverConstants.DEADBAND;
         }
 
@@ -132,194 +392,6 @@ public class RobotContainer {
                 } else{
                         return 0.5;
                 }
-        }
-
-        SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
-                        () -> driverController.getLeftY() * getMultiplier(),
-                        () -> driverController.getLeftX() * getMultiplier())
-                        .withControllerRotationAxis(() -> getRightX())
-                        .deadband(getDeadzone())
-                        .scaleTranslation(1)// Can be changed to alter speed
-                        .allianceRelativeControl(true);
-
-        SwerveInputStream driveRobotOrientedVelocity = driveAngularVelocity.copy().robotRelative(true).allianceRelativeControl(false);
-        // SwerveInputStream driveDirectAngle = driveAngularVelocity.copy() .robotRelative(() -> isRobotRelative())
-        //                 .withControllerHeadingAxis(() -> driverController.getRightX(),
-        //                                 () -> driverController.getRightY())
-        //                 .headingWhile(true);
-
-        //Command driveFieldOrientedDirectAngle = drivebase.driveRobotOriented(driveDirectAngle);
-
-        Command driveFieldOrientedAngularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
-        Command driveRobotOriented = drivebase.driveFieldOriented(driveRobotOrientedVelocity);
-
-        /**
-         * Use this method to define your trigger->command mappings. Triggers can be
-         * created via the
-         * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
-         * an arbitrary
-         * predicate, or via the named factories in {@link
-         * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
-         * {@link
-         * CommandXboxController
-         * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-         * PS4} controllers or
-         * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-         * joysticks}.
-         */
-        private void configureBindings() {
-                // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-                // new Trigger(m_exampleSubsystem::exampleCondition)
-                // .onTrue(new ExampleCommand(m_exampleSubsystem));
-
-                // new Trigger(() -> getRightTriggerValue())
-                // .onTrue(new TestCommand());
-
-                // Primary Commands
-                // new Trigger(() -> getRightDriverTriggerValue()) // CORAL STATION COMMAND
-                //                 .whileTrue(new AutoIntakeCommand(intakeSubsystem, shoulderSubsystem,
-                //                                 elevatorSubsystem, wristSubsystem));
-                // new Trigger(() -> getLeftDriverTriggerValue())
-                //                 .whileTrue(new LockApriltag(limelightSubsystem));
-
-                // new JoystickButton(driverController, XboxController.Button.kLeftBumper.value)
-                //                 .whileTrue(new GroundVerticalPickupCommand(intakeSubsystem, shoulderSubsystem, elevatorSubsystem, wristSubsystem));
-                new Trigger(driverController::getRightBumperButton).whileTrue(driveRobotOriented);
-                // new Trigger(() -> getLeftDriverTriggerValue()) // Place Coral On Reef
-                //                 .whileTrue(new AutoPlaceCommand(intakeSubsystem, shoulderSubsystem, elevatorSubsystem));
-
-                // // Driver movement
-                // new JoystickButton(driverController, XboxController.Button.kB.value)
-                //                 .whileTrue(new ZeroGyroCommand(drivebase));
-                // // Wrist Movement Manual
-                // new POVButton(driverController, 90)
-                //                 .whileTrue(new WristTestCommand(wristSubsystem, 1));
-                // new POVButton(driverController, 270)
-                //                 .whileTrue(new WristTestCommand(wristSubsystem, -1));
-                // // Wrist Movement PID
-                // new JoystickButton(driverController, XboxController.Button.kX.value)
-                //                 .whileTrue(new WristVerticalCommand(wristSubsystem));
-                // new JoystickButton(driverController, XboxController.Button.kA.value)
-                //                 .whileTrue(new WristHorizontalCommand(wristSubsystem));
-                // new JoystickButton(driverController, XboxController.Button.kA.value)
-                // .whileTrue(new ApriltagLineup(drivebase, limelightSubsystem));
-
-                // // Shoulder Movement
-                // new JoystickButton(driverController, XboxController.Button.kStart.value)
-                //                 .whileTrue(new ShoulderCommand(shoulderSubsystem, 1));
-                // new JoystickButton(driverController, XboxController.Button.kBack.value)
-                //                 .whileTrue(new ShoulderCommand(shoulderSubsystem, -1));
-
-                // // Elevator Movement
-                // new JoystickButton(driverStation, 6)
-                //                 .whileTrue(new ElevatorINCommand(elevatorSubsystem));
-                // new JoystickButton(driverStation, 8)
-                //                 .whileTrue(new WristHorizontalCommand(wristSubsystem));
-                // new JoystickButton(driverStation, 1)
-                //                 .whileTrue(new ElevatorOUTCommand(elevatorSubsystem)); 
-                //  new JoystickButton(driverStation, 9)
-                //                 .whileTrue(new WristVerticalCommand(wristSubsystem));
-
-                // // Intake Control
-                // new JoystickButton(driverController, XboxController.Button.kY.value)
-                //                 .whileTrue(new IntakeOutCommand(intakeSubsystem, true));
-                // new POVButton(driverController, 0)
-                //                 .whileTrue(new IntakeOutSlowCommand(intakeSubsystem));
-                // new POVButton(driverController, 180)
-                //                 .whileTrue(new IntakeCommand(intakeSubsystem, false));
-
-
-                // ---------AUX CONTROLS
-                // --------------------------------------------------------------
-
-                // // Grid navigation
-                // new Trigger(() -> getRightAuxTriggerValue()) // FOR SELECTOR SUBSYSTEM
-                //                 .whileTrue(new AutoPlaceCommand(intakeSubsystem, shoulderSubsystem, elevatorSubsystem));
-                // new Trigger(() -> getLeftAuxTriggerValue())
-                //                 .whileTrue(new ClearAlgaeCommand(shoulderSubsystem, elevatorSubsystem, wristSubsystem, intakeSubsystem));
-
-                // new POVButton(auxController, 180) /* D-Pad pressed DOWN */
-                //                 .whileTrue(new CursorDownCommand(selectorSubsystem));
-                // new POVButton(auxController, 0) /* D-Pad pressed UP */
-                //                 .whileTrue(new CursorUpCommand(selectorSubsystem));
-                // new POVButton(auxController, 90) /* D-Pad pressed Right */
-                //                 .whileTrue(new CursorRightCommand(selectorSubsystem));
-                // // new POVButton(auxController, 270) /* D-Pad pressed Left */
-                // //                 .whileTrue(new CursorLeftCommand(selectorSubsystem));
-                // new POVButton(auxController, 90) /* D-Pad pressed DOWN */
-                //                 .whileTrue(new IntakeCommand(intakeSubsystem, true));
-                // new POVButton(auxController, 270) /* D-Pad pressed UP */
-                //                 .whileTrue(new IntakeOutCommand(intakeSubsystem, true));
-                // // new POVButton(auxController, 90) /* D-Pad pressed Right */
-                // //                 .whileTrue(new CursorRightCommand(selectorSubsystem));
-                // // new POVButton(auxController, 270) /* D-Pad pressed Left */
-                // //                 .whileTrue(new CursorLeftCommand(selectorSubsystem));
-
-
-                // // Movement presets
-                // new JoystickButton(auxController, XboxController.Button.kY.value)
-                //                 .whileTrue(new MoveRightL4Command(shoulderSubsystem, elevatorSubsystem,
-                //                                 wristSubsystem));
-                // new JoystickButton(auxController, XboxController.Button.kX.value)
-                //                 .whileTrue(new MoveRightL1Command(shoulderSubsystem, elevatorSubsystem,
-                //                                 wristSubsystem));
-                // new JoystickButton(auxController, XboxController.Button.kA.value)
-                //                 .whileTrue(new MoveRightL2Command(shoulderSubsystem, elevatorSubsystem,
-                //                                 wristSubsystem));
-                // new JoystickButton(auxController, XboxController.Button.kB.value)
-                //                 .whileTrue(new MoveRightL3Command(shoulderSubsystem, elevatorSubsystem,
-                //                                 wristSubsystem));
-                // new POVButton(auxController, 180) /* D-Pad pressed DOWN */
-                //                 .whileTrue(new MoveLowerAlgaeCommand(shoulderSubsystem, elevatorSubsystem,
-                //                                 wristSubsystem, intakeSubsystem));
-
-                // // new JoystickButton(auxController, XboxController.Button.)
-
-                // // Wrist PIDs
-                // new JoystickButton(auxController, XboxController.Button.kLeftBumper.value)
-                //                 .whileTrue(new WristVerticalCommand(wristSubsystem));
-                // new JoystickButton(auxController, XboxController.Button.kRightBumper.value)
-                //                 .whileTrue(new WristHorizontalCommand(wristSubsystem));
-
-                // // Climber Controls
-                // new JoystickButton(auxController, XboxController.Button.kStart.value)
-                //                 .whileTrue(new ActuatorInCommand(actuatorSubsystem));
-                // new JoystickButton(auxController, XboxController.Button.kBack.value)
-                //                 .whileTrue(new ActuatorOutCommand(actuatorSubsystem));
-
-
-
-
-                /*
-                 * OTHER CONTROLS::
-                 * DRIVER:
-                 * -- LEFT JOYSTICK: TRANSLATION
-                 * -- RIGHT JOYSTICK: ROTATION
-                 * AUX:
-                 * -- RIGHT JOYSTICK: ROBOT FACES LEFT CORAL STATION, AND VICE VERSA
-                 * 
-                 */
-
-        }
-
-        // private void configureNamedCommands(){
-        //         NamedCommands.registerCommand("armL1", new MoveRightL1Command(shoulderSubsystem, elevatorSubsystem, wristSubsystem));
-        //         NamedCommands.registerCommand("armL2", new MoveRightL2Command(shoulderSubsystem, elevatorSubsystem, wristSubsystem));
-        //         NamedCommands.registerCommand("armL3", new MoveRightL3Command(shoulderSubsystem, elevatorSubsystem, wristSubsystem));
-
-        //         NamedCommands.registerCommand("moveTo", new MoveToStationCommand(shoulderSubsystem, elevatorSubsystem, wristSubsystem));
-
-        //         NamedCommands.registerCommand("place", new AutoPlaceCommand(intakeSubsystem, shoulderSubsystem, elevatorSubsystem));
-        //         NamedCommands.registerCommand("autoIntake", new AutoIntakeCommand(intakeSubsystem, shoulderSubsystem, elevatorSubsystem, wristSubsystem));
-        //         NamedCommands.registerCommand("intakeOut", new IntakeOutCommand(intakeSubsystem, true));
-        //         NamedCommands.registerCommand("algae-clear", new ClearAlgaeCommand(shoulderSubsystem, elevatorSubsystem, wristSubsystem, intakeSubsystem));
-        //         NamedCommands.registerCommand("reset-elevator", new ResetElevatorCommand(elevatorSubsystem));
-                
-        // }
-
-        private void initializeDashboard(){
-                SmartDashboard.putNumber("Gyro", drivebase.getSwerveDrive().getGyro().getRotation3d().getZ() * (180/Math.PI));
-                SmartDashboard.putNumber("odometry angle", drivebase.getPose().getRotation().getDegrees());
         }
 
         private boolean isRobotRelative(){
@@ -395,19 +467,19 @@ public class RobotContainer {
 
         /**
          * 
-         * @return True if manual, false if automatic
+         * @return True if up, false if down
          */
-        private boolean getManualSwitch() {
-                return driverStation.getRawButtonPressed(7);
-        }
+        // private boolean getSwitch() {
+        //         SmartDashboard.putBoolean("switch", !manualSwitch.getAsBoolean());
+        //         return !manualSwitch.getAsBoolean();
+        // }
 
         /**
          * 
          * @return Will return the controller input either divided by two or not based on whether you hold the joystick button. If you hold left trigger, it will use the limelight to auto rotate
          */
         private double getRightX() {
-                SmartDashboard.putNumber("pos rot", drivebase.getSwerveDrive().getPose().getRotation().getDegrees());
-                SmartDashboard.putString("time", formattedTime);
+                //SmartDashboard.putNumber("pos rot", driveSubsystem.getSwerveDrive().getPose().getRotation().getDegrees());
                 if(getLeftDriverTriggerValue()){
                 
                                 return getControllerRotation();
@@ -416,20 +488,11 @@ public class RobotContainer {
                         
                 }
                 
+                //System.out.println("switch: " + getSwitch());
                 return getControllerRotation();
         }
 
         private double getControllerRotation() {
                 return driverController.getRightX() * getTurnMultiplier();     
-        }
-
-        /**
-         * Use this to pass the autonomous command to the main {@link Robot} class.
-         *
-         * @return the command to run in autonomous
-         */
-        public Command getAutonomousCommand() {
-                return autoChooser.getSelected();
-                // return null;
         }
 }
