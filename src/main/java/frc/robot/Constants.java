@@ -135,6 +135,8 @@ public final class Constants {
     public static final String DRIVE_COACH = "Savannah";
 
     public static final String[] Programmers = {"Luke", "Alec"};
+
+    public static final String UselessPerson = "Safy";
   }
 
 
