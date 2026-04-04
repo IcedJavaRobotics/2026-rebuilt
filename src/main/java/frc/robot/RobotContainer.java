@@ -4,494 +4,102 @@
 
 package frc.robot;
 
-import frc.robot.Constants.DriverConstants;
-import frc.robot.Constants.DriverStationConstants;
-// import frc.robot.commands.RollerInCommand;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import swervelib.SwerveInputStream;
+import static edu.wpi.first.units.Units.*;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import swervelib.SwerveInputStream;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
-import java.io.ObjectInputFilter.Status;
-import java.util.Map;
-import java.util.function.BooleanSupplier;
+import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-// import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.*;
-import frc.robot.commands.autocommands.*;
-import frc.robot.commands.intake.*;
-import frc.robot.commands.shooter.*;
-import frc.robot.commands.spindexer.*;
-import frc.robot.commands.swerve.*;
-
-import java.util.Date;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-
-/**
- * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
- * subsystems, commands, and trigger mappings) should be declared here.
- */
 public class RobotContainer {
+    private double MaxSpeed = 0.4 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
-        // initialize subsystems
-        private final SwerveSubsystem driveSubsystem = new SwerveSubsystem();
-        private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-        private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
-        private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem();
-        private final VisionSubsystem visionSubsystem = new VisionSubsystem();
-        private final LimelightSubsystem limelightSubsystem = new LimelightSubsystem();
+    /* Setting up bindings for necessary control of the swerve drive platform */
+    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+            .withDriveRequestType(DriveRequestType.Velocity); // Use open-loop control for drive motors
+    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+    private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-        // Initialize Controllers
-        private final XboxController driverController = new XboxController(DriverConstants.MAIN_DRIVER_PORT);
-        private final XboxController auxController = new XboxController(DriverConstants.AUX_DRIVER_PORT);
-        //private final Joystick driverStation = new Joystick(DriverConstants.DRIVER_STATION_PORT);
+    private final Telemetry logger = new Telemetry(MaxSpeed);
 
-        // Triggers for more control
-        //JoystickButton manualSwitch = new JoystickButton(driverStation, 7);
-        // Trigger shootcontrolSwitch = new Trigger( () -> getSwitch());
-        Trigger shootingTrigger = new Trigger( () -> getRightAuxTriggerValue());
-        Trigger manualShootingTrigger = new Trigger( () -> getLeftAuxTriggerValue());
+    private final CommandXboxController joystick = new CommandXboxController(0);
 
-        Trigger intakeTrigger = new Trigger( () -> getLeftDriverTriggerValue());
-        Trigger lockTrigger = new Trigger( () -> getRightDriverTriggerValue());
+    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
+    public RobotContainer() {
+        LimelightHelpers.SetIMUMode("limelight-sauron", 0);
+        configureBindings();
+    }
 
-        // BooleanSupplier switchEnabled = ( () -> getSwitch());
-        private final SendableChooser<Command> autoChooser;
+    private SwerveRequest driveUpdate(){
+        LimelightHelpers.SetRobotOrientation("limelight-sauron", drivetrain.getPigeon2().getYaw().getValueAsDouble(), drivetrain.getPigeon2().getAngularVelocityZDevice().getValueAsDouble(), 18, 0, 180, 0);
+        return drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
+    }
 
-        PIDController headingController = new PIDController(0.015, 0, 0.001); // PID for making robot automatically face the hub
-
-        private String formattedTime = "hi";
-
-        /**
-         * The container for the robot. Contains subsystems, OI devices, and commands.
-         */
-        public RobotContainer() {
-
-                // Configure the trigger bindings
-                headingController.enableContinuousInput(-180, 180); //Causes the pid for heading to loop along with the gyro
-                configureBindings();
-
-                // Setup default commands
-                driveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity); //this means you can just run another command to move to heading or autoalign
-                System.out.println("Awesome name.........100%");
-                System.out.println("Neuralink.........100%");
-                System.out.println("Spaghetti code.........100%");
-     
-                autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be
-                SmartDashboard.putData("AutoSelec", autoChooser);
-
-                initializeDashboard();
-                setupNamedCommands();
-                // System.out.println("switch: " + getSwitch());
-        }
-
-
-        SwerveInputStream driveAngularVelocity = SwerveInputStream.of(driveSubsystem.getSwerveDrive(),
-                        () -> driverController.getLeftY() * getMultiplier(),
-                        () -> driverController.getLeftX() * getMultiplier())
-                        .withControllerRotationAxis(() -> getRightX())
-                        .deadband(getDeadzone())
-                        .scaleTranslation(1)// Can be changed to alter speed
-                        .allianceRelativeControl(false);
-
-        SwerveInputStream driveRobotOrientedVelocity = driveAngularVelocity.copy().robotRelative(true).allianceRelativeControl(false);
-
-        Command driveFieldOrientedAngularVelocity = driveSubsystem.driveFieldOriented(driveAngularVelocity);
-        Command driveRobotOriented = driveSubsystem.driveFieldOriented(driveRobotOrientedVelocity);
-        // Command resetIntake = intakeSubsystem.resetElevator(() -> getSwitch());
-
-        /**
-         * Use this method to define your trigger->command mappings. Triggers can be
-         * created via the
-         * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
-         * an arbitrary
-         * predicate, or via the named factories in {@link
-         * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
-         * {@link
-         * CommandXboxController
-         * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-         * PS4} controllers or
-         * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-         * joysticks}.
-         */
-        private void configureBindings() {
-
-                // ----------------------- MAIN DRIVER CONTROLS ----------------------------------------------------------------------
-
-                // Left bumper causes straightforward driving
-                new Trigger(driverController::getRightBumperButton).whileTrue(driveRobotOriented);
-
-                // Full intake command/Hold Intake (Holding makes intake elevator and rollers start, letting go resets)
-                intakeTrigger.whileTrue(new IntakeHold(intakeSubsystem)).onFalse(new PullIntakeInCommand(intakeSubsystem));
+    private void configureBindings() {
+        // Note that X is defined as forward according to WPILib convention,
+        // and Y is defined as to the left according to WPILib convention.
+        drivetrain.setDefaultCommand(
+            // Drivetrain will execute this command periodically
+            drivetrain.applyRequest(() -> driveUpdate()
                 
-                // B button causes the driver to zero their controller
-                new JoystickButton(driverController, XboxController.Button.kB.value)
-                        .whileTrue(new ZeroGyro(driveSubsystem));  //zero gyro on B
-                
-                // new JoystickButton(driverController, XboxController.Button.kA.value)
-                //         .whileTrue(new IntakeRollerTest(intakeSubsystem));
-                
-                // new JoystickButton(driverController, XboxController.Button.kB.value)
-                //         .whileTrue(new StartShooter(shooterSubsystem));
+            )
+        );
 
-                new JoystickButton(driverController, XboxController.Button.kStart.value)
-                        .whileTrue(new IntakeElevatorOut(intakeSubsystem));
-                new JoystickButton(driverController, XboxController.Button.kBack.value)
-                        .whileTrue(new IntakeElevatorIn(intakeSubsystem));
-                new JoystickButton(driverController, XboxController.Button.kA.value)
-                        .whileTrue(new ShimmyIntakeCommand(intakeSubsystem));
-                // Right trigger locks up wheels
-                lockTrigger.whileTrue(new LockUpWheels(driveSubsystem));
+        // Idle while the robot is disabled. This ensures the configured
+        // neutral mode is applied to the drive motors while disabled.
+        final var idle = new SwerveRequest.Idle();
+        RobotModeTriggers.disabled().whileTrue(
+            drivetrain.applyRequest(() -> idle).ignoringDisable(true)
+        );
 
-                // ----------------------- AUX DRIVER CONTROLS -----------------------------------------------------------------------
+        joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        joystick.b().whileTrue(drivetrain.applyRequest(() ->
+            point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
+        ));
 
-                // Elevator Out
-                // new JoystickButton(auxController, XboxController.Button.kY.value)
-                //          .whileTrue(new IntakeElevatorOut(intakeSubsystem));
-                // Elevator In
-                // new JoystickButton(auxController, XboxController.Button.kB.value)
-                //          .whileTrue(new IntakeElevatorIn(intakeSubsystem));
-                // Shooter Power down
-                new JoystickButton(auxController, XboxController.Button.kBack.value)
-                        .whileTrue(new TurnDownShooter(shooterSubsystem));
-                // Shooter Power up
-                new JoystickButton(auxController, XboxController.Button.kStart.value)
-                        .whileTrue(new TurnUpShooter(shooterSubsystem));
-                // Shooter Reverse
-                new JoystickButton(auxController, XboxController.Button.kY.value)
-                        .whileTrue(new ShooterReverse(shooterSubsystem));
-                new JoystickButton(auxController, XboxController.Button.kA.value)
-                        .whileTrue(new SpindexerCommandReverse(spindexerSubsystem));
-                new JoystickButton(auxController, XboxController.Button.kX.value)
-                        .whileTrue(new SpindexerCommand(spindexerSubsystem));
-                new JoystickButton(auxController, XboxController.Button.kLeftBumper.value)
-                        .whileTrue(new PanicReset(intakeSubsystem));
+        // Run SysId routines when holding back/start and X/Y.
+        // Note that each routine should be run exactly once in a single log.
+        joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-                // Just shoot
-                // new JoystickButton(auxController, XboxController.Button.kStart.value)
-                //         .whileTrue(new StartShooter(shooterSubsystem));
-                // Just index
-                new JoystickButton(auxController, XboxController.Button.kX.value)
-                        .whileTrue(new SpindexerCommand(spindexerSubsystem));
+        // Reset the field-centric heading on left bumper press.
+        joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+        joystick.b().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.kZero)));
 
-                // Starts shooter
-                shootingTrigger.whileTrue(new StartShooter(shooterSubsystem));
-                manualShootingTrigger.whileTrue(new SpindexerCommand(spindexerSubsystem));
+        drivetrain.registerTelemetry(logger::telemeterize);
+    }
 
-
-
-                //print "shut up you chud" - Antony
-
-                // ----------------------- BUTTON BOARD CONTROLS ----------------------------------------------------------------------
-                
-                /* 
-                // Shooter Functions Check (Starts shooter)
-               new JoystickButton(driverStation, DriverStationConstants.BOTTOM_LEFT)
-                        .whileTrue(new StartShooter(shooterSubsystem));
-                // Elevator Out
-                new JoystickButton(driverStation, DriverStationConstants.TOP_LEFT)
-                        .whileTrue(new IntakeElevatorOut(intakeSubsystem));
-                // Elevator In
-                new JoystickButton(driverStation, DriverStationConstants.MIDDLE_LEFT)
-                        .whileTrue(new IntakeElevatorIn(intakeSubsystem));
-                // Full intake command/Hold Intake (Holding makes intake elevator and rollers start, letting go resets)
-                new JoystickButton(driverStation, DriverStationConstants.MIDDLE_RIGHT)
-                        .whileTrue(new IntakeHold(intakeSubsystem));
-                // Zeroes the intake
-                new JoystickButton(driverStation, DriverStationConstants.BOTTOM_MIDDLE)
-                        .whileTrue(new ZeroIntake(intakeSubsystem));
-                // Shooter Reverse
-                new JoystickButton(driverStation, DriverStationConstants.TOP_RIGHT)
-                        .whileTrue(new IntakeRollerTest(intakeSubsystem));
-                */
-
-                
-        }
-
-        /**
-         * Sets up the Smartdashboard by adding all the values we will monitor on there
-         */
-        private void initializeDashboard(){
-                setupDriverstation();
-                
-                // Switches
-                SmartDashboard.putBoolean("auto intake inward", true);
-                SmartDashboard.putBoolean("leds on", false);
-        }
-
-        private void setupNamedCommands(){
-                NamedCommands.registerCommand("HoldShoot", new FullShootCommand(shooterSubsystem, spindexerSubsystem, limelightSubsystem));
-        }
-        /**
-         * Sets up various things of the driver station
-         * - Silences joystick warnings
-         * - 
-         */
-        private void setupDriverstation(){
-                DriverStation.silenceJoystickConnectionWarning(true);
-                SmartDashboard.putNumber("Match Number", DriverStation.getMatchNumber());
-                SmartDashboard.putString("Match type", DriverStation.getMatchType().toString());
-                SmartDashboard.putString("Alliance", DriverStation.getAlliance().get().toString());
-                SmartDashboard.putString("Competition", DriverStation.getEventName());
-                SmartDashboard.putNumber("Time left", DriverStation.getMatchTime());
-
-                // Adds time booted to the dashboard
-                Date currentDate = new Date();
-                LocalTime currentTime = LocalTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-                formattedTime = currentTime.format(formatter);
-        }
-
-        /**
-         * runs periodically to update the dashboards info with info that continuously updates
-         */
-        private void updateDashboard(){
-                SmartDashboard.putNumber("Time left", DriverStation.getMatchTime());
-        }
-
-
-        /**
-         * Use this to pass the autonomous command to the main {@link Robot} class.
-         *
-         * @return the command to run in autonomous
-         */
-        public Command getAutonomousCommand() { 
-                //return autoChooser.getSelected(); 
-                return getTerribleShittyAutonomous();
-
-        }
-
-        private Command getTerribleShittyAutonomous(){
-                return new SequentialCommandGroup(
-                        // new TurnOnReverseSpindexer(spindexerSubsystem),
-                        // new WaitCommand(0.4),
-                        // new TurnOffSpindexer(spindexerSubsystem),
-                        new TurnOnShooter(shooterSubsystem),
-                        new WaitCommand(2),
-                        new TurnOnSpindexer(spindexerSubsystem),
-                        new WaitCommand(5),
-                        new TurnOnReverseSpindexer(spindexerSubsystem),
-                        new WaitCommand(1.5),
-                        new TurnOnSpindexer(spindexerSubsystem),
-                        new WaitCommand(1),
-                        new SetIntakeOut(intakeSubsystem),
-                        new WaitCommand(0.9),
-                        new SetIntakeIn(intakeSubsystem),
-                        new WaitCommand(0.8),
-                        new SetIntakeOut(intakeSubsystem),
-                        new WaitCommand(0.8),
-                        new SetIntakeIn(intakeSubsystem),
-                        new WaitCommand(0.8),
-                        new SetIntakeOff(intakeSubsystem),
-                        new WaitCommand(2),
-                        new TurnOffSpindexer(spindexerSubsystem),
-                        new TurnOffShooter(shooterSubsystem)
-                 );
-        }
-                private Command getTerribleShittyAutonomousWithDelay(){
-                return new SequentialCommandGroup(
-                        // new TurnOnReverseSpindexer(spindexerSubsystem),
-                        // new WaitCommand(0.4),
-                        // new TurnOffSpindexer(spindexerSubsystem),
-                        new WaitCommand(7),
-                        new TurnOnShooter(shooterSubsystem),
-                        new WaitCommand(2),
-                        new TurnOnSpindexer(spindexerSubsystem),
-                        new WaitCommand(5),
-                        new TurnOnReverseSpindexer(spindexerSubsystem),
-                        new WaitCommand(1.5),
-                        new TurnOnSpindexer(spindexerSubsystem),
-                        new WaitCommand(1),
-                        new SetIntakeOff(intakeSubsystem),
-                        new WaitCommand(2),
-                        new TurnOffSpindexer(spindexerSubsystem),
-                        new TurnOffShooter(shooterSubsystem)
-                 );
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        // ----------------------------------------------------------------------------------------------------------------------------------------
-        // --------------------------UTILITY METHODS FOR THE CONTROLLERS---------------------------------------------------------------------------
-        // ----------------------------------------------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-                
-        private double getDeadzone() {
-                return DriverConstants.DEADBAND;
-        }
-
-        private double getLeftX() {
-                return -driverController.getLeftX();
-        }
-
-        private double getLeftY() {
-                return -driverController.getLeftY();
-        }
-        private double getMultiplier(){
-                if(driverController.getLeftStickButton()){
-                        return 1;
-                } else if(getLeftDriverTriggerValue()){
-                        return 0.4;
-                }
-                return 0.5;
-        }
-
-        private double getTurnMultiplier(){
-                if(driverController.getRightStickButton()){
-                        return 1;
-                } else{
-                        return 0.5;
-                }
-        }
-
-        private boolean isRobotRelative(){
-                if(driverController.getRightBumperButton()){
-                        return true;
-                }
-                return false;
-        }
-
-        private boolean auxRightstickLeft() {
-                if (auxController != null) {
-                        if (auxController.getRightX() <= -0.5) {
-                                return true;
-                        }
-                        return false;
-                }
-                return false;
-        }
-
-        private boolean getRightDriverTriggerValue() {
-                if (driverController != null) {
-                        if (driverController.getRightTriggerAxis() >= 0.5) {
-                                return true;
-                        }
-                        return false;
-                } else {
-                        return false;
-                }
-        }
-
-        private boolean getLeftDriverTriggerValue() {
-                if (driverController != null) {
-                        if (driverController.getLeftTriggerAxis() >= 0.5) {
-                                return true;
-                        }
-                        return false;
-                } else {
-                        return false;
-                }
-        }
-
-        private boolean getRightAuxTriggerValue() {
-                if (auxController != null) {
-                        if (auxController.getRightTriggerAxis() >= 0.5) {
-                                return true;
-                        }
-                        return false;
-                } else {
-                        return false;
-                }
-        }
-        private boolean getLeftAuxTriggerValue() {
-                if (auxController != null) {
-                        if (auxController.getLeftTriggerAxis() >= 0.5) {
-                                return true;
-                        }
-                        return false;
-                } else {
-                        return false;
-                }
-        }
-
-        private boolean getLeftTriggerValue() {
-                if (driverController != null) {
-                        if (driverController.getLeftTriggerAxis() >= 0.5) {
-                                return true;
-                        }
-                        return false;
-                } else {
-                        return false;
-                }
-        }
-
-        /**
-         * 
-         * @return True if up, false if down
-         */
-        // private boolean getSwitch() {
-        //         SmartDashboard.putBoolean("switch", !manualSwitch.getAsBoolean());
-        //         return !manualSwitch.getAsBoolean();
-        // }
-
-        /**
-         * 
-         * @return Will return the controller input either divided by two or not based on whether you hold the joystick button. If you hold left trigger, it will use the limelight to auto rotate
-         */
-        private double getRightX() {
-                //SmartDashboard.putNumber("pos rot", driveSubsystem.getSwerveDrive().getPose().getRotation().getDegrees());
-                if(getLeftDriverTriggerValue()){
-                
-                                return getControllerRotation();
-                        
-                        
-                        
-                }
-                
-                //System.out.println("switch: " + getSwitch());
-                return getControllerRotation();
-        }
-
-        private double getControllerRotation() {
-                return driverController.getRightX() * getTurnMultiplier();     
-        }
+    public Command getAutonomousCommand() {
+        // Simple drive forward auton
+        final var idle = new SwerveRequest.Idle();
+        return Commands.sequence(
+            // Reset our field centric heading to match the robot
+            // facing away from our alliance station wall (0 deg).
+            drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.kZero)),
+            // Then slowly drive forward (away from us) for 5 seconds.
+            drivetrain.applyRequest(() ->
+                drive.withVelocityX(0.5)
+                    .withVelocityY(0)
+                    .withRotationalRate(0)
+            )
+            .withTimeout(5.0),
+            // Finally idle for the rest of auton
+            drivetrain.applyRequest(() -> idle)
+        );
+    }
 }
