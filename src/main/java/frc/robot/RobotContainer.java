@@ -101,11 +101,10 @@ public class RobotContainer {
                 configureBindings();
 
                 // Setup default commands
-                driveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity); 
+                driveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity); //this means you can just run another command to move to heading or autoalign
                 System.out.println("Awesome name.........100%");
                 System.out.println("Neuralink.........100%");
                 System.out.println("Spaghetti code.........100%");
-                //intakeSubsystem.setDefaultCommand(resetIntake);     //.onlyIf(switchEnabled));
      
                 autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be
                 SmartDashboard.putData("AutoSelec", autoChooser);

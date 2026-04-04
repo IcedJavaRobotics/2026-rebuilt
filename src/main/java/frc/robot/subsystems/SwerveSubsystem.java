@@ -51,8 +51,11 @@ public class SwerveSubsystem extends SubsystemBase {
 
 
   public SwerveSubsystem() {
-      
+
+
     LimelightHelpers.setCameraPose_RobotSpace("limelight-sauron", -0.2, 0, 0.52, 180, -22, 0);
+    LimelightHelpers.SetIMUMode("limelight-sauron", 4);
+
     try {
       swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.DriverConstants.MAX_SPEED,
           new Pose2d(new Translation2d(Units.feetToMeters(3),

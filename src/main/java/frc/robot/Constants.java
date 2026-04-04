@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.util.FlippingUtil;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -103,7 +107,8 @@ public final class Constants {
   public static class VisionSubsystem {
     public static final String LIMELIGHT_NAME = "sauron";
     public static final String LIMELIGHT_IP = "http://10.68.94.11:5801/";
-
+    public static final Pose2d hubPos = new Pose2d(Units.inchesToMeters(182.11), Units.inchesToMeters(158.84), new Rotation2d());
+    public static final Pose2d redHubPos = FlippingUtil.flipFieldPose(hubPos);    
     
   }
 
@@ -137,6 +142,7 @@ public final class Constants {
     public static final String[] Programmers = {"Luke", "Alec"};
 
     public static final String UselessPerson = "Safy";
+
   }
 
 
