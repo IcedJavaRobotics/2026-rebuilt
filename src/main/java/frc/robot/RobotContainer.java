@@ -12,14 +12,35 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-
-import frc.robot.generated.TunerConstants;
+import frc.robot.commands.intake.ElevatorExtend;
+import frc.robot.commands.intake.ElevatorRetract;
+import frc.robot.commands.primary.FullIntakeCommand;
+import frc.robot.commands.primary.RetractIntakeCommand;
+import frc.robot.commands.shooter.FullShootCommand;
+import frc.robot.commands.tests.indexer.IndexerBackwardsTest;
+import frc.robot.commands.tests.indexer.IndexerForwardTest;
+import frc.robot.commands.tests.roller.RollerForwardTest;
+import frc.robot.commands.tests.roller.RollerReverseTest;
+import frc.robot.commands.tests.shooter.ShooterBackwardsTest;
+import frc.robot.commands.tests.shooter.ShooterForwardTest;
+import frc.robot.commands.tests.shooter.ShooterTestStartupCommand;
+import frc.robot.data.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.*;
 
 public class RobotContainer {
+
+    ElevatorSubsystem elevatorSubsystem;
+    IndexerSubsystem indexerSubsystem;
+    RollerSubsystem rollerSubsystem;
+    ShooterSubsystem shooterSubsystem;
+
+
     private double MaxSpeed = 0.4 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
@@ -37,6 +58,11 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public RobotContainer() {
+        elevatorSubsystem = new ElevatorSubsystem();
+        indexerSubsystem = new IndexerSubsystem();
+        rollerSubsystem = new RollerSubsystem();
+        shooterSubsystem = new ShooterSubsystem();
+
         LimelightHelpers.SetIMUMode("limelight-sauron", 0);
         configureBindings();
     }
@@ -49,6 +75,15 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
+
+
+        joystick.leftTrigger(0.3).whileTrue(new FullIntakeCommand(elevatorSubsystem, rollerSubsystem, indexerSubsystem).andThen((new RetractIntakeCommand(elevatorSubsystem, rollerSubsystem)).withDeadline(new WaitCommand(1))));
+        joystick.rightTrigger(0.3).whileTrue(new FullShootCommand(shooterSubsystem, indexerSubsystem));
+        //a and b are occupied
+        joystick.x().whileTrue(new ShooterTestStartupCommand(shooterSubsystem));
+        joystick.start().whileTrue(new ElevatorExtend(elevatorSubsystem));
+        joystick.back().whileTrue(new ElevatorRetract(elevatorSubsystem));
+
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
@@ -85,6 +120,13 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
+
+
+        return functionsCheckCommand();
+        // return new SelfFeedCommand(shooterSubsystem, indexerSubsystem);
+    }
+
+    public Command straightLineAuto(){
         // Simple drive forward auton
         final var idle = new SwerveRequest.Idle();
         return Commands.sequence(
@@ -100,6 +142,25 @@ public class RobotContainer {
             .withTimeout(5.0),
             // Finally idle for the rest of auton
             drivetrain.applyRequest(() -> idle)
+        );
+    }
+
+    public Command functionsCheckCommand(){
+        return Commands.sequence(
+            new WaitCommand(4),
+            new PrintCommand("testing shooter:  "),
+            new WaitCommand(1),
+            new ShooterForwardTest(shooterSubsystem).withDeadline(new WaitCommand(2)),
+            new WaitCommand(2),
+            new ShooterBackwardsTest(shooterSubsystem).withDeadline(new WaitCommand(2)),
+            new WaitCommand(2),
+            new ShooterTestStartupCommand(shooterSubsystem).withDeadline(new WaitCommand(5)),
+            new PrintCommand("testing rollers and indexer: both forwards first"),
+            new WaitCommand(4),
+            new RollerForwardTest(rollerSubsystem).withDeadline(new WaitCommand(3)),
+            new IndexerForwardTest(indexerSubsystem).withDeadline(new WaitCommand(3)),
+            new RollerReverseTest(rollerSubsystem).withDeadline(new WaitCommand(3)),
+            new IndexerBackwardsTest(indexerSubsystem).withDeadline(new WaitCommand(3))
         );
     }
 }
